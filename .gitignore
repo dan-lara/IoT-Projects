@@ -2,3 +2,6 @@
 venv/
 .venv/
 __pycache__/
+
+wifi_data.json
+output.csv
