@@ -1,0 +1,8 @@
+fastapi==0.95.2
+uvicorn==0.22.0
+pandas==2.2.3
+numpy==2.1.1
+requests
+matplotlib
+scipy
+# geoplotlib
