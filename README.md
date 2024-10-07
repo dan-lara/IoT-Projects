@@ -1,2 +1,2 @@
 # IoT-Projects
-Repodedicated to Polytech Sorbonne's IoT projects
+Repo dedicated to Polytech Sorbonne's IoT projects
