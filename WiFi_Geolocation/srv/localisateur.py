@@ -6,7 +6,7 @@ def read_DB_csv_file(csv_file):
     # Charger le fichier CSV et l'analyser dans un DataFrame pandas
     csv_file = 'BDD.csv'
     df = pd.read_csv(csv_file, delimiter=';', encoding='ISO-8859-1')
-    df = df.dropna()
+    # df = df.dropna()
     return df
 
 def read_WiFi_json_file(json_file):
@@ -21,7 +21,7 @@ def read_WiFi_json_file(json_file):
     for element in wifi_data.get("Networks", []):
         network = {
             'MAC': element.get('MAC'),
-            'SSID': element.get('SSID'),
+            # 'SSID': element.get('SSID'),
             'RSSI': element.get('RSSI'),
         }
         wifi_networks.append(network)
@@ -34,17 +34,18 @@ def fetch_locations(df, wifi_json):
     # Charger les données JSON dans un DataFrame
 
     wifi_df = pd.read_json(wifi_json)
-    
+    print(wifi_df)
     # Merge the WiFi DataFrame with the location DataFrame based on the MAC address
     # Fusionner le DataFrame WiFi avec le DataFrame de localisation en fonction de l'adresse MAC
     df.columns = ['MAC', 'SSID', 'RSSI', 'Latitude', 'Longitude', 'Altitude', 'Acuracy', 'Type']
     merged_df = pd.merge(wifi_df, df, on='MAC', how='inner')
+    print("Merged DataFrame: \n", merged_df)
     print(merged_df.size)
-    if merged_df.empty or merged_df.size < 30:
-        return search_api()
-    merged_df.rename(columns={'SSID_x': 'SSID', 'RSSI_x': 'RSSI'}, inplace=True)
-    merged_df.drop(['SSID_y', 'RSSI_y', 'Type'], axis=1, inplace=True)
-    merged_df[['Latitude', 'Longitude', 'Altitude', 'Acuracy']] = merged_df[['Latitude', 'Longitude', 'Altitude', 'Acuracy']].astype(float)
+    # if merged_df.empty:# or merged_df.size < 30:
+    #     return search_api()
+    merged_df.rename(columns={'RSSI_x': 'RSSI'}, inplace=True)
+    merged_df.drop(['RSSI_y', 'Type'], axis=1, inplace=True)
+    merged_df[['Latitude', 'Longitude', 'Altitude', 'Accuracy']] = merged_df[['Latitude', 'Longitude', 'Altitude', 'Acuracy']].astype(float)
     merged_df['RSSI'] = merged_df['RSSI'].astype(int)
     return merged_df
 
@@ -53,7 +54,8 @@ def search_api():
     # Placeholder pour l'appel API pour obtenir les données de localisation
     return None
 
-# bdd = read_DB_csv_file('BDD.csv')
-# wifi = read_WiFi_json_file('wifi_data.json')
-# location_df = fetch_locations(bdd, wifi)
-# print("Location DataFrame: \n", location_df)
+bdd = read_DB_csv_file('BDD.csv')
+wifi = read_WiFi_json_file('wifi_data.json')
+print("WiFi JSON: \n", wifi)
+location_df = fetch_locations(bdd, wifi)
+print("Location DataFrame: \n", location_df)
