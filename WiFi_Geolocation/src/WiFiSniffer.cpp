@@ -8,16 +8,19 @@ WiFiSniffer::WiFiSniffer(int min, int max) : networks(nullptr), numNetworks(0) {
   delay(100);
 }
 
+// Destructeur
 WiFiSniffer::~WiFiSniffer() {
   if (networks != nullptr)
     delete[] networks;
 }
 
+// Méthode pour définir les limites min et max
 void WiFiSniffer::setLimits(int min, int max) {
   limitsNetworks[0] = min;  // Min
   limitsNetworks[1] = max;  // Max
 }
 
+// Méthode pour scanner et trier les réseaux WiFi
 bool WiFiSniffer::scanAndSortNetworks() {
   if (networks != nullptr) {
     delete[] networks;
@@ -30,27 +33,28 @@ bool WiFiSniffer::scanAndSortNetworks() {
     Serial.println("Aucun réseau trouvé");
     return false;
   }
-  // Allocate memory for networks
+  // Allouer de la mémoire pour les réseaux
   networks = new NetworkInfo[numNetworks];
-  // Store network information
+  // Stocker les informations des réseaux
   for (int i = 0; i < numNetworks; ++i) {
     networks[i].ssid = WiFi.SSID(i);
     networks[i].bssid = WiFi.BSSIDstr(i);
     networks[i].rssi = WiFi.RSSI(i);
     networks[i].distance = calculateDistance(WiFi.RSSI(i));
   }
-  // Sort networks
+  // Trier les réseaux
   sortNetworks();
-  // Free the WiFi scan memory
+  // Libérer la mémoire du scan WiFi
   WiFi.scanDelete();
   
   return true;
 }
 
+// Méthode pour trier les réseaux par RSSI (signal le plus fort en premier)
 void WiFiSniffer::sortNetworks() {
   if (!networks || numNetworks == 0) return;
   
-  // Bubble sort by RSSI (strongest signal first)
+  // Tri à bulles par RSSI
   for (int i = 0; i < numNetworks - 1; i++) 
     for (int j = 0; j < numNetworks - i - 1; j++) 
       if (networks[j].rssi < networks[j + 1].rssi) {
@@ -103,7 +107,7 @@ void WiFiSniffer::detectPublicAPs(const String& publicSSID) {
   }
 }
 
-
+// Méthode pour générer un JSON avec les informations des réseaux
 String WiFiSniffer::generateJSON() {
   if (networks == nullptr || numNetworks < limitsNetworks[0]) {
     if (!scanAndSortNetworks())
