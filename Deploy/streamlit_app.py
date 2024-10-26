@@ -26,4 +26,7 @@ tp3 = st.Page(
 pg = st.navigation([tp2, tp3]
 )
 st.set_page_config(page_title="Data manager", page_icon=":shark:", layout="wide")
+st.sidebar.title("Data manager")
+st.title("Data manager")
+st.write("This application is a data manager for the IoT devices.")
 pg.run()
