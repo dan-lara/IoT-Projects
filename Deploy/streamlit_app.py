@@ -1,5 +1,5 @@
 import streamlit as st
-
+st.logo("images/poly_logo.jpeg", icon_image="images/logo.jpeg")
 # try:
 #     from WiFi_Geolocation.srv.app import geoloc_main as geoloc_app  # Certifique-se de que 'app.py' possui uma função 'run'
 # except Exception as e:
