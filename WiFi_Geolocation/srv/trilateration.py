@@ -1,8 +1,12 @@
 from scipy.optimize import minimize
 import numpy as np
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from localisateur import *
 
-DEBUG = True
+DEBUG = False
 
 def rssi_to_distance(rssi, rssi_0=-30, n=2.5):
     """
@@ -49,7 +53,7 @@ def estimate_position(location_data):
 
 if DEBUG:
     # bdd = read_DB_csv_file('data/BDD.csv')
-    bdd = read_DB_csv_file('https://github.com/dan-lara/IoT-Projects/raw/refs/heads/master/WiFi_Geolocation/srv/data/BDD.csv')
+    bdd = read_DB_csv_file(os.getenv("BDD_PATH"))
     print("BDD CSV:", bdd)
 
     wifi = read_WiFi_json_file('data/wifi_data.json')
