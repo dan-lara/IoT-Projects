@@ -2,6 +2,8 @@ import pandas as pd
 from io import StringIO
 import json
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 DEBUG = False
 
@@ -70,7 +72,7 @@ def fetch_locations(df, wifi_json):
 
 if DEBUG:
     # bdd = read_DB_csv_file('data/BDD.csv')
-    bdd = read_DB_csv_file('https://github.com/dan-lara/IoT-Projects/raw/refs/heads/master/WiFi_Geolocation/srv/data/BDD.csv')
+    bdd = read_DB_csv_file(os.getenv("BDD_PATH"))
     print("BDD CSV:", bdd)
 
     wifi = read_WiFi_json_file('data/wifi_data.json')
