@@ -7,11 +7,7 @@ import locale
 import os
 import psycopg2
 
-from localisateur import read_DB_csv_file
-
-st.set_page_config(layout="wide")
 locale.setlocale(locale.LC_TIME, 'fr_FR')
-
 
 load_dotenv()
 POSTGRES_HOST = str(os.getenv('POSTGRES_HOST'))
@@ -64,7 +60,7 @@ def get_device_names(df):
 # Function to get unique device names
 @st.cache_data
 def get_wifi_database():
-    return read_DB_csv_file(BDD_PATH)
+    return pd.read_csv(BDD_PATH, delimiter=';', encoding='ISO-8859-1')
 
 # Function to filter dataframe based on selections
 def filter_dataframe(df, selected_devices, date_range):
@@ -134,7 +130,7 @@ def plot_map(latitude, longitude, networks):
         st.error(f"Error plotting map: {str(e)}")
 
 # Main Streamlit app
-def main():
+def geoloc_main():
     st.title("Device Location Viewer")
     
     # Fetch initial data
@@ -217,5 +213,5 @@ def main():
                     st.error(f"Error plotting map: {str(e)}")
                 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__geoloc_main__":
+    geoloc_main()
