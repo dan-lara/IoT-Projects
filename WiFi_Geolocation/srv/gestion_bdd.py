@@ -16,18 +16,17 @@ POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 #SQLite
 DB_FILE = 'data/geoloc_data.db'
 
-
-def persist_data(device_name, lat, lon, wifi_json, db_type='sqlite'):
+def persist_data(device_name, lat, lon, wifi_json, received_at, db_type='sqlite'):
     """Insère les données reçues dans la base de données"""
     if db_type == 'sqlite':
-        persist_data_sqlite(device_name, lat, lon, wifi_json)
+        persist_data_sqlite(device_name, lat, lon, wifi_json, received_at)
     elif db_type == 'postgres':
-        persist_data_postgres(device_name, lat, lon, wifi_json)
+        persist_data_postgres(device_name, lat, lon, wifi_json, received_at)
     else:
         print("Type de base de données inconnu.")
 
 
-def persist_data_postgres(device_name, lat, lon, wifi_json):
+def persist_data_postgres(device_name, lat, lon, wifi_json, received_at):
     """Insère les données reçues dans la base de données PostgreSQL"""
     try:
         # Connexion à la base de données PostgreSQL
@@ -54,9 +53,9 @@ def persist_data_postgres(device_name, lat, lon, wifi_json):
 
         # Insertion des données dans la table
         cursor.execute('''
-            INSERT INTO locations (device_name, latitude, longitude, wifi_networks)
-            VALUES (%s, %s, %s, %s)
-        ''', (device_name, lat, lon, wifi_json))
+            INSERT INTO locations (device_name, latitude, longitude, wifi_networks, timestamp)
+            VALUES (%s, %s, %s, %s, %s)
+        ''', (device_name, lat, lon, wifi_json, received_at))
 
         # Validation de l'insertion dans la base de données
         conn.commit()
@@ -68,7 +67,7 @@ def persist_data_postgres(device_name, lat, lon, wifi_json):
     except Exception as e:
         print(f"Erreur lors de l'enregistrement dans la base de données PostgreSQL: {e}")
 
-def persist_data_sqlite(device_name, lat, lon, wifi_json):
+def persist_data_sqlite(device_name, lat, lon, wifi_json, received_at):
     """Insère les données reçues dans la base de données SQLite"""
     try:
         # Connexion à la base de données SQLite
@@ -85,8 +84,8 @@ def persist_data_sqlite(device_name, lat, lon, wifi_json):
                     wifi_networks TEXT)''')  # Colonne pour le JSON des réseaux WiFi
         
         # Insertion des données dans la table
-        c.execute("INSERT INTO locations (device_name, latitude, longitude, wifi_networks) VALUES (?, ?, ?, ?)",
-                (device_name, lat, lon, wifi_json))
+        c.execute("INSERT INTO locations (device_name, latitude, longitude, wifi_networks, timestamp) VALUES (?, ?, ?, ?, ?)",
+                (device_name, lat, lon, wifi_json, received_at))
         
         # Validation de l'insertion dans la base de données
         conn.commit()
