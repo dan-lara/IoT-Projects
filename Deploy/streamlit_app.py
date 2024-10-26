@@ -2,17 +2,17 @@ import streamlit as st
 
 st.set_page_config(page_title="Data manager", page_icon=":shark:", layout="wide")
 
-# st.title("Data manager")
-# st.logo("images/poly_logo.jpeg", icon_image="images/logo.jpeg")
+st.title("Data manager")
+st.logo("images/poly_logo.png", icon_image="images/logo.png")
 
 tp2 = st.Page(
     "pages/geo.py",
-    title="Request 1",
-    icon=":material/help:",
+    title="Geolocation",
+    icon=":world:",
 )
 tp3 = st.Page(
     "pages/temp.py",
-    title="Request 2",
+    title="Temperature",
     icon=":material/help:",
 )
 def login():
