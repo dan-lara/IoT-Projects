@@ -1,9 +1,8 @@
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
-import psycopg2
 import json
 import os
-from triangulateur import estimate_position
+from trilateration import estimate_position
 from localisateur import *
 from gestion_bdd import persist_data
 
@@ -18,6 +17,7 @@ MQTT_BROKER = os.getenv('MQTT_BROKER')
 MQTT_USERNAME = os.getenv('MQTT_USERNAME')
 MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
 MQTT_TOPIC = os.getenv('MQTT_TOPIC')
+MQTT_PORT = os.getenv('MQTT_PORT')
 
 def get_location_df(wifis):
     # Lire la base de données à partir d'un fichier CSV
@@ -97,5 +97,5 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # Se connecter au broker et démarrer la boucle
-client.connect(MQTT_BROKER, 1883, 60)
+client.connect(MQTT_BROKER, MQTT_PORT, 60)
 client.loop_forever()

@@ -4,6 +4,7 @@ import sqlite3
 import json
 import os
 from dotenv import load_dotenv
+load_dotenv()
 
 #POSTGRES
 POSTGRES_HOST = os.getenv('POSTGRES_HOST')
