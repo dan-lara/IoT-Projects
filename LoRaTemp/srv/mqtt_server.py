@@ -1,12 +1,13 @@
 import paho.mqtt.client as mqtt
+from dotenv import load_dotenv
 import psycopg2
 import json
 import os
-from dotenv import load_dotenv
 from gestion_bdd import persist_data
 
 DEBUG = False
 BDD = 'postgres' # 'sqlite' ou 'postgres'
+
 # Charger les variables d'environnement à partir du fichier .env
 load_dotenv()
 
@@ -31,11 +32,11 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload.decode())
         
         # Extraire 'device_id'
-        device_id = payload.get('end_device_ids', {}).get('device_id', 'inconnu')
+        device_id = payload.get('end_device_ids', {}).get('device_id', None)
         if DEBUG:
             print("Device ID:", device_id)
         # Extraire 'received_at'
-        received_at = payload.get('received_at', 'inconnu')
+        received_at = payload.get('received_at', None)
         if DEBUG:
             print("Reçu:", received_at)
         # Extraire 'Uplink_message -> decoded_payload'
