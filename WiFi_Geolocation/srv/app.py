@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
 import folium
-import locale
+# import locale
 import os
 import psycopg2
 
-locale.setlocale(locale.LC_TIME, 'fr_FR')
+# locale.setlocale(locale.LC_TIME, 'fr_FR')
 
 load_dotenv()
 POSTGRES_HOST = str(os.getenv('POSTGRES_HOST'))
