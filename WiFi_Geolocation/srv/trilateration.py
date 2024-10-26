@@ -1,102 +1,63 @@
-# from __future__ import division
-# import math
-# import numpy as np
-
-# http://en.wikipedia.org/wiki/Trilateration
-# assuming elevation = 0
-# length unit : km
-
-# earthR = 6371
-
-# class base_station(object):
-#     def __init__(self, lat, lon, dist):
-#         self.lat = lat
-#         self.lon = lon
-#         self.dist = dist
-
-# #using authalic sphere
-# #if using an ellipsoid this step is slightly different
-# #Convert geodetic Lat/Long to ECEF xyz
-# #   1. Convert Lat/Long to radians
-# #   2. Convert Lat/Long(radians) to ECEF  (Earth-Centered,Earth-Fixed)
-# def convert_geodetci_to_ecef(base_station):
-#     x = earthR *(math.cos(math.radians(base_station.lat)) * math.cos(math.radians(base_station.lon)))
-#     y = earthR *(math.cos(math.radians(base_station.lat)) * math.sin(math.radians(base_station.lon)))
-#     z = earthR *(math.sin(math.radians(base_station.lat)))
-#     print (x, y, z)
-#     return np.array([x, y, z])
-
-# def calculate_trilateration_point_ecef(base_station_list):
-#     P1, P2, P3 = map(convert_geodetci_to_ecef, base_station_list)
-#     DistA, DistB, DistC = map(lambda x: x.dist, base_station_list)
-
-#     #vector transformation: circle 1 at origin, circle 2 on x axis
-#     ex = (P2 - P1)/(np.linalg.norm(P2 - P1))
-#     i = np.dot(ex, P3 - P1)
-#     ey = (P3 - P1 - i*ex)/(np.linalg.norm(P3 - P1 - i*ex))
-#     ez = np.cross(ex,ey)
-#     d = np.linalg.norm(P2 - P1)
-#     j = np.dot(ey, P3 - P1)
-
-#     #plug and chug using above values
-#     x = (pow(DistA,2) - pow(DistB,2) + pow(d,2))/(2*d)
-#     y = ((pow(DistA,2) - pow(DistC,2) + pow(i,2) + pow(j,2))/(2*j)) - ((i/j)*x)
-
-#     # only one case shown here
-#     z = np.sqrt(pow(DistA,2) - pow(x,2) - pow(y,2))
-
-#     #triPt is an array with ECEF x,y,z of trilateration point
-#     triPt = P1 + x*ex + y*ey + z*ez
-
-#     #convert back to lat/long from ECEF
-#     #convert to degrees
-#     lat = math.degrees(math.asin(triPt[2] / earthR))
-#     lon = math.degrees(math.atan2(triPt[1],triPt[0]))
-
-
-
-import numpy as np
-import pandas as pd
 from scipy.optimize import minimize
+import numpy as np
+from localisateur import *
 
-def trilateration_2D(df):
-    # Fonction pour convertir le RSSI en distance (en mètres)
-    def rssi_to_distance(rssi, A=-40, n=2):
-        """
-        Calcule la distance basée sur le RSSI.
-        A : RSSI à 1 mètre
-        n : Exposant de perte de propagation
-        """
-        return 10 ** ((A - rssi) / (10 * n))
+DEBUG = True
 
-    # Conversion du RSSI en distance
-    df['Distance'] = df['RSSI'].apply(lambda rssi: rssi_to_distance(rssi))
-    
-    # Sélection des points d'accès pour la trilatération (il faut au moins 3 points)
-    access_points = df[['Latitude', 'Longitude', 'Distance']]
-    
-    # Définition de la fonction d'erreur pour la trilatération
-    def trilateration_error(x, points):
-        """
-        Calcule l'erreur de distance entre la position estimée x et les points d'accès.
-        x : Position estimée [Latitude, Longitude]
-        points : DataFrame avec les colonnes Latitude, Longitude, Distance
-        """
-        error = 0
-        for _, row in points.iterrows():
-            # Calcul de la distance entre la position estimée et chaque point d'accès
-            distance_calculated = np.sqrt((x[0] - row['Latitude'])**2 + (x[1] - row['Longitude'])**2)
-            # Somme des erreurs quadratiques
-            error += (distance_calculated - row['Distance'])**2
-        return error
+def rssi_to_distance(rssi, rssi_0=-30, n=2.5):
+    """
+    Convertit la valeur RSSI en distance.
 
-    # Point initial (moyenne des coordonnées des points d'accès)
-    initial_position = [access_points['Latitude'].mean(), access_points['Longitude'].mean()]
+    Paramètres:
+    - rssi: Valeur RSSI mesurée.
+    - rssi_0: Valeur RSSI à 1 mètre (par défaut -30 dBm).
+    - n: Exposant de perte de chemin (par défaut 2.5).
 
-    # Optimisation de la position pour minimiser l'erreur
-    result = minimize(trilateration_error, initial_position, args=(access_points,), method='BFGS')
+    Retourne:
+    - Distance estimée en mètres.
+    """
+    distance = 10 ** ((rssi_0 - rssi) / (10 * n))
+    return distance
+
+def estimate_position(location_data):
+    """
+    Estime la position d'un dispositif basé sur les points d'accès détectés.
     
-    # Coordonnées estimées après optimisation
-    estimated_position = result.x
+    Paramètres:
+    - location_data: DataFrame avec les informations des APs (MAC, SSID, RSSI, Latitude, Longitude, Altitude).
     
-    return estimated_position
+    Retourne:
+    - Latitude, Longitude et Altitude estimées du dispositif.
+    """
+    # Extraire les positions et les distances
+    positions = np.array(list(zip(location_data['Latitude'], location_data['Longitude'], location_data['Altitude'])))
+    distances = np.array([rssi_to_distance(rssi) for rssi in location_data['RSSI']])
+    
+    # Définir la fonction d'erreur à minimiser (méthode des moindres carrés)
+    def error_function(x, positions, distances):
+        estimated_distances = np.sqrt(np.sum((positions - x) ** 2, axis=1))
+        return np.sum((estimated_distances - distances) ** 2)
+    
+    # Point initial de recherche
+    initial_guess = np.mean(positions, axis=0)
+    
+    # Optimisation pour trouver la meilleure position
+    result = minimize(error_function, initial_guess, args=(positions, distances), method='L-BFGS-B')
+    
+    # Retourne la position estimée
+    return result.x
+
+if DEBUG:
+    # bdd = read_DB_csv_file('data/BDD.csv')
+    bdd = read_DB_csv_file('https://github.com/dan-lara/IoT-Projects/raw/refs/heads/master/WiFi_Geolocation/srv/data/BDD.csv')
+    print("BDD CSV:", bdd)
+
+    wifi = read_WiFi_json_file('data/wifi_data.json')
+    print("WiFi JSON: \n", wifi)
+
+    location_df = fetch_locations(bdd, wifi)
+    print("DataFrame de localisation: \n", location_df)
+
+    position = estimate_position(location_df)
+    print("Latitude estimée:", position[0])
+    print("Longitude estimée:", position[1])
