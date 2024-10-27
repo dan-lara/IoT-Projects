@@ -180,7 +180,7 @@ def geoloc_main():
         st.subheader("Data Points")
         # Format the timestamp for display
         display_df = filtered_df.copy()
-        display_df['timestamp'] = display_df['timestamp'].dt.strftime('%d %B %Y, %H:%M')
+        display_df['timestamp'] = display_df['timestamp'].dt.strftime('%Y-%m-%d, %H:%M')
 
         st.dataframe(
             display_df[['id', 'device_name', 'timestamp', 'latitude', 'longitude']],
@@ -192,14 +192,14 @@ def geoloc_main():
         selected_id = select_line.selectbox(
             "Select Point ID",
             options=filtered_df['id'].tolist(),
-            format_func=lambda x: f"ID: {x} ({filtered_df[filtered_df['id'] == x]['timestamp'].iloc[0].strftime('%d %B %Y %H:%M')})"
+            format_func=lambda x: f"ID: {x} ({filtered_df[filtered_df['id'] == x]['timestamp'].iloc[0].strftime('%Y-%m-%d %H:%M')})"
         )
         
         if selected_id:
             selected_row = filtered_df[filtered_df['id'] == selected_id].iloc[0]
             
             st.sidebar.write("Device:", selected_row['device_name'])
-            st.sidebar.write("Date :", selected_row['timestamp'].strftime('%d %B %Y, %H:%M'))
+            st.sidebar.write("Date :", selected_row['timestamp'].strftime('%Y-%m-%d, %H:%M'))
             st.sidebar.write("Latitude:", selected_row['latitude'])
             st.sidebar.write("Longitude:", selected_row['longitude'])
             with col1:
