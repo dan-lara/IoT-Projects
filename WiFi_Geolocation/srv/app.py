@@ -2,18 +2,19 @@ from streamlit_folium import st_folium
 from dotenv import load_dotenv 
 import streamlit as st
 import pandas as pd
+import psycopg2
 import folium
 import locale
 import os
-import psycopg2
+
 
 from localisateur import read_DB_csv_file
 
 st.set_page_config(layout="wide")
 locale.setlocale(locale.LC_TIME, 'fr_FR')
 
-
 load_dotenv()
+
 POSTGRES_HOST = str(os.getenv('POSTGRES_HOST'))
 POSTGRES_PORT = os.getenv('POSTGRES_PORT')
 POSTGRES_DATABASE = os.getenv('POSTGRES_DATABASE')
