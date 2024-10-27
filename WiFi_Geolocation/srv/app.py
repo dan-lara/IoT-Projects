@@ -130,7 +130,7 @@ def plot_map(latitude, longitude, networks):
         st.error(f"Error plotting map: {str(e)}")
 
 # Main Streamlit app
-def app():
+def main():
     st.title("Device Location Viewer")
     
     # Fetch initial data
@@ -213,5 +213,5 @@ def app():
                     st.error(f"Error plotting map: {str(e)}")
                 
 
-if __name__ == "__app__":
-    app()
+if __name__ == "__main__":
+    main()
