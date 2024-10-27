@@ -18,7 +18,6 @@ POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 BDD_PATH = os.getenv('BDD_PATH')
 
 # Cache the database connection
-@st.cache_resource
 def init_connection():
     try:
         conn = psycopg2.connect(
