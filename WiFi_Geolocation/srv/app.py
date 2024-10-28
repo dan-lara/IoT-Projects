@@ -5,7 +5,7 @@ import pandas as pd
 import folium
 # import locale
 import os
-import psycopg2
+from sqlalchemy import create_engine
 
 # locale.setlocale(locale.LC_TIME, 'fr_FR')
 
@@ -20,14 +20,17 @@ BDD_PATH = os.getenv('BDD_PATH')
 # Cache the database connection
 def init_connection():
     try:
-        conn = psycopg2.connect(
-            host=POSTGRES_HOST,
-            port=POSTGRES_PORT,
-            dbname=POSTGRES_DATABASE,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
-            client_encoding='utf8'
-        )
+        conn_str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
+        conn = create_engine(conn_str)
+        # conn = psycopg2.connect(
+        #     host=POSTGRES_HOST,
+        #     port=POSTGRES_PORT,
+        #     dbname=POSTGRES_DATABASE,
+        #     user=POSTGRES_USER,
+        #     password=POSTGRES_PASSWORD,
+        #     client_encoding='utf8'
+        # )
+        # conn.autocommit = True
         return conn
     except Exception as e:
         st.error(f"Error connecting to database: {str(e)}")
@@ -36,20 +39,20 @@ def init_connection():
 # Cache the data fetching function
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def fetch_data():
-    with init_connection() as conn:
-        try:
-            query = """
-                SELECT id, device_name, timestamp, latitude, longitude, wifi_networks
-                FROM locations
-                ORDER BY timestamp DESC
-            """
-            df = pd.read_sql(query, conn)
-            # Convert timestamp to local timezone
-            df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert('Europe/Paris')
-            return df
-        except Exception as e:
-            st.error(f"Error fetching data: {str(e)}")
-            return pd.DataFrame()
+    try:
+        conn = init_connection()
+        query = """
+            SELECT id, device_name, timestamp, latitude, longitude, wifi_networks
+            FROM locations
+            ORDER BY timestamp DESC
+        """
+        df = pd.read_sql(query, conn)
+        # Convert timestamp to local timezone
+        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert('Europe/Paris')
+        return df
+    except Exception as e:
+        st.error(f"Error fetching data: {str(e)}")
+        return pd.DataFrame()
 
 # Function to get unique device names
 @st.cache_data
@@ -130,6 +133,9 @@ def plot_map(latitude, longitude, networks):
 
 # Main Streamlit app
 def main():
+    st.set_page_config(page_title="WiFi Geolocation", page_icon=":earth_america:", layout="wide",)
+
+    st.logo("data/images/poly_logo.png", icon_image="data/images/logo.png",size="large")
     st.title("Device Location Viewer")
     
     # Fetch initial data
@@ -153,19 +159,21 @@ def main():
     # Date range selection
     min_date = df['timestamp'].dt.date.min()
     max_date = df['timestamp'].dt.date.max()
-    date_range = st.sidebar.date_input(
-        "Select Date Range",
-        value=(min_date, max_date),
-        min_value=min_date,
-        max_value=max_date
-    )
-    
-    # Ensure date_range is a tuple of two dates
-    if isinstance(date_range, tuple):
-        start_date, end_date = date_range
-    else:
-        start_date = end_date = date_range
-    
+    try:
+        date_range = st.sidebar.date_input(
+            "Select Date Range",
+            value=(min_date, max_date),
+            min_value=min_date,
+            max_value=max_date
+        )
+        # Ensure date_range is a tuple of two dates
+        if isinstance(date_range, tuple):
+            start_date, end_date = date_range
+        else:
+            start_date = end_date = date_range
+    except Exception as e:
+        st.warning  ("You must to select a date range")
+        return
     # Filter data based on selections
     filtered_df = filter_dataframe(df, selected_devices, (start_date, end_date))
     
