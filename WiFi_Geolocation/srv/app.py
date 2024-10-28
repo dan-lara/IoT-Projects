@@ -135,7 +135,10 @@ def plot_map(latitude, longitude, networks):
 def main():
     st.set_page_config(page_title="WiFi Geolocation", page_icon=":earth_america:", layout="wide",)
 
-    st.logo("data/images/poly_logo.png", icon_image="data/images/logo.png",size="large")
+    st.logo(
+        "https://github.com/dan-lara/IoT-Projects/blob/138e9e768686d8683e279094f3426210872f00a9/WiFi_Geolocation/srv/data/images/poly_logo.png",
+        icon_image="https://github.com/dan-lara/IoT-Projects/blob/138e9e768686d8683e279094f3426210872f00a9/WiFi_Geolocation/srv/data/images/logo.png",
+        size="large")
     st.title("Device Location Viewer")
     
     # Fetch initial data
