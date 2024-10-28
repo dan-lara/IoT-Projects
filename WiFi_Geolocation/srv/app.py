@@ -133,7 +133,7 @@ def plot_map(latitude, longitude, networks):
 
 # Main Streamlit app
 def main():
-    st.set_page_config(page_title="WiFi Geolocation", page_icon=":earth_america", layout="wide",)
+    st.set_page_config(page_title="WiFi Geolocation", page_icon=":earth_africa", layout="wide",)
     LOGO_PATH = os.getenv('LOGO_PATH')
     ICON_PATH = os.getenv('ICON_PATH')
     st.logo(
