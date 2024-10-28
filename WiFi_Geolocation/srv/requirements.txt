@@ -9,3 +9,4 @@ python-dotenv==1.0.1
 scipy==1.14.1
 streamlit==1.39.0
 streamlit_folium==0.23.1
+SQLAlchemy==2.0.36
