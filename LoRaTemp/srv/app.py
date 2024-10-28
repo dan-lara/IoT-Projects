@@ -109,16 +109,20 @@ def main():
     except Exception as e:
         st.warning("Vous devez sélectionner une plage de dates")
         return
-
-    # Time range selection
-    min_time = df['timestamp'].dt.time.min()
-    max_time = df['timestamp'].dt.time.max()
-    time_range = st.sidebar.slider(
-        "Sélectionnez la plage horaire",
-        value=(min_time, max_time),
-        format="HH:mm"
-    )
-
+    try:
+        # Time range selection
+        min_time = df['timestamp'].dt.time.min()
+        max_time = df['timestamp'].dt.time.max()
+        time_range = st.sidebar.slider(
+            "Sélectionnez la plage horaire",
+            value=(min_time, max_time),
+            format="HH:mm",
+            min_value=min_time,
+            max_value=max_time
+        )
+    except Exception as e:
+        st.warning("Vouz devez sélectionner une plage horaire")
+        return
     # Filter data based on selections
     filtered_df = filter_dataframe(df, selected_devices, (start_date, end_date), time_range)
 
