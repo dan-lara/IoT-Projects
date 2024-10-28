@@ -5,3 +5,4 @@ __pycache__/
 
 wifi_data.json
 output.csv
+persist.py

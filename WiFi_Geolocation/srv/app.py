@@ -34,6 +34,7 @@ def init_connection():
             password=POSTGRES_PASSWORD,
             client_encoding='utf8'
         )
+        conn.autocommit = True
         return conn
     except Exception as e:
         st.error(f"Error connecting to database: {str(e)}")
@@ -139,11 +140,11 @@ def main():
     st.title("Device Location Viewer")
     
     # Fetch initial data
-    try:
-        df = fetch_data()
-    except Exception as e:
-        st.error(f"Error connecting to database: {str(e)}")
-        return
+    # try:
+    df = fetch_data()
+    # except Exception as e:
+    #     st.error(f"Error connecting to database: {str(e)}")
+    #     return
 
     # Sidebar filters
     st.sidebar.header("Filters")

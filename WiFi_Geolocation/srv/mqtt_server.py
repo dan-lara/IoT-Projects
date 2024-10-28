@@ -21,7 +21,7 @@ MQTT_PORT = os.getenv('MQTT_PORT')
 
 def get_location_df(wifis):
     # Lire la base de données à partir d'un fichier CSV
-    bdd = read_DB_csv_file('BDD.csv')
+    bdd = read_DB_csv_file('data/BDD.csv')
     wifis = json.dumps(wifis)
     # Récupérer les localisations à partir de la base de données
     location_df = fetch_locations(bdd, wifis)
@@ -97,5 +97,5 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # Se connecter au broker et démarrer la boucle
-client.connect(MQTT_BROKER, MQTT_PORT, 60)
+client.connect(MQTT_BROKER, int(MQTT_PORT), 60)
 client.loop_forever()

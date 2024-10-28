@@ -16,7 +16,7 @@ LoRaModule lora(DEV_EUI, APP_EUI, APP_KEY, LORA_RX, LORA_TX, MAX_TRIES, ("DR"+St
 #define DHTPIN D4     // Broche de données du capteur DHT11
 #define DHTTYPE DHT11 // Type de capteur DHT
 // Création de l'instance du capteur DHT avec 5000ms d'interval
-DHTManager dht(DHTPIN, DHTTYPE, 5000);
+DHTManager dht(DHTPIN, DHTTYPE, 10000);
 
 void setup() {
   delay(100);
@@ -41,5 +41,5 @@ void loop() {
     lora.sendToLoRa(data,3000);
     String response = lora.checkResponse();
   }
-  delay(5000);
+  // delay(5000);
 }
