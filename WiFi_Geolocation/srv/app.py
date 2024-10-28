@@ -196,7 +196,8 @@ def main():
         st.dataframe(
             display_df[['id', 'device_name', 'timestamp', 'latitude', 'longitude']],
             hide_index=True,
-            height=540
+            height=540,
+            use_container_width=True
         )
     
     with col2:
