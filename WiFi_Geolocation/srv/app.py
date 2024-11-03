@@ -33,7 +33,7 @@ def init_connection():
         # conn.autocommit = True
         return conn
     except Exception as e:
-        st.error(f"Error connecting to database: {str(e)}")
+        st.error(f"Erreur de connexion à la base de données : {str(e)}")
         return None
 
 # Cache the data fetching function
@@ -51,7 +51,7 @@ def fetch_data():
         df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert('Europe/Paris')
         return df
     except Exception as e:
-        st.error(f"Error fetching data: {str(e)}")
+        st.error(f"Erreur lors de la récupération des données : {str(e)}")
         return pd.DataFrame()
 
 # Function to get unique device names
@@ -115,7 +115,7 @@ def plot_map(latitude, longitude, networks):
         location_df = fetch_locations(networks)
 
     except Exception as e:
-        st.error(f"Error fetching locations: {str(e)}")
+        st.error(f"Erreur lors de la récupération des endroits : {str(e)}")
     try:
         # Ajouter des cercles pour chaque point avec SSID et RSSI
         for i in range(location_df.shape[0]):
@@ -129,67 +129,68 @@ def plot_map(latitude, longitude, networks):
         st_folium(map, width=800)
         
     except Exception as e:
-        st.error(f"Error plotting map: {str(e)}")
+        st.error(f"Erreur lors de l'affichage de la carte : {str(e)}")
 
 # Main Streamlit app
 def main():
-    st.set_page_config(page_title="WiFi Geolocation", page_icon=":earth_africa", layout="wide",)
+    st.set_page_config(page_title="Géolocalisation WiFi", page_icon=":earth_africa:", layout="wide")
     LOGO_PATH = os.getenv('LOGO_PATH')
     ICON_PATH = os.getenv('ICON_PATH')
     st.logo(
         image = LOGO_PATH,
         icon_image = ICON_PATH,
         size = "large")
-    st.title("Device Location Viewer")
+    st.title("Visualiseur de Localisation des Appareils")
     
-    # Fetch initial data
+    # Récupérer les données initiales
     try:
         df = fetch_data()
     except Exception as e:
-        st.error(f"Error connecting to database: {str(e)}")
+        st.error(f"Erreur de connexion à la base de données: {str(e)}")
         return
 
-    # Sidebar filters
-    st.sidebar.header("Filters")
-    
-    # Device selection
+    # Sidebar filtres
+    st.sidebar.header("Filtres")
+
+    # Sélection de l'appareil
     device_names = get_device_names(df)
     selected_devices = st.sidebar.multiselect(
-        "Select Devices",
+        "Sélectionner l'appareil",
         options=device_names,
         default=device_names
     )
     
-    # Date range selection
+    # Sélection de la plage de dates
     min_date = df['timestamp'].dt.date.min()
     max_date = df['timestamp'].dt.date.max()
     try:
         date_range = st.sidebar.date_input(
-            "Select Date Range",
+            "Sélectionner la Plage de Dates",
             value=(min_date, max_date),
             min_value=min_date,
             max_value=max_date
         )
-        # Ensure date_range is a tuple of two dates
+        # S'assurer que date_range est un tuple de deux dates
         if isinstance(date_range, tuple):
             start_date, end_date = date_range
         else:
             start_date = end_date = date_range
     except Exception as e:
-        st.warning  ("You must to select a date range")
+        st.warning("Vous devez sélectionner une plage de dates")
         return
-    # Filter data based on selections
+    
+    # Filtrer les données en fonction des sélections
     filtered_df = filter_dataframe(df, selected_devices, (start_date, end_date))
     
-    # Display filtered data
+    # Afficher les données filtrées
     col1, col2 = st.columns([5, 3])
     
     
     with col2: 
-        st.subheader("Selected Point Details")
+        st.subheader("Détails du Point Sélectionné")
         select_line = st.empty()
-        st.subheader("Data Points")
-        # Format the timestamp for display
+        st.subheader("Points de Données")
+        
         display_df = filtered_df.copy()
         display_df['timestamp'] = display_df['timestamp'].dt.strftime('%Y-%m-%d, %H:%M')
 
@@ -202,7 +203,7 @@ def main():
     
     with col2:
         selected_id = select_line.selectbox(
-            "Select Point ID",
+            "Sélectionner l'ID du Point",
             options=filtered_df['id'].tolist(),
             format_func=lambda x: f"ID: {x} ({filtered_df[filtered_df['id'] == x]['timestamp'].iloc[0].strftime('%Y-%m-%d %H:%M')})"
         )
@@ -210,7 +211,7 @@ def main():
         if selected_id:
             selected_row = filtered_df[filtered_df['id'] == selected_id].iloc[0]
             
-            st.sidebar.write("Device:", selected_row['device_name'])
+            st.sidebar.write("Appareil:", selected_row['device_name'])
             st.sidebar.write("Date :", selected_row['timestamp'].strftime('%Y-%m-%d, %H:%M'))
             st.sidebar.write("Latitude:", selected_row['latitude'])
             st.sidebar.write("Longitude:", selected_row['longitude'])
@@ -222,7 +223,7 @@ def main():
                         networks=selected_row['wifi_networks']
                     )
                 except Exception as e:
-                    st.error(f"Error plotting map: {str(e)}")
+                    st.error(f"Erreur lors de l'affichage de la carte: {str(e)}")
                 
 
 if __name__ == "__main__":
