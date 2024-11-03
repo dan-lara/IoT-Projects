@@ -17,7 +17,7 @@ POSTGRES_USER = os.getenv('POSTGRES_USER')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 BDD_PATH = os.getenv('BDD_PATH')
 
-# Cache the database connection
+# Mettre en cache la connexion à la base de données
 def init_connection():
     try:
         conn_str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
@@ -36,8 +36,8 @@ def init_connection():
         st.error(f"Erreur de connexion à la base de données : {str(e)}")
         return None
 
-# Cache the data fetching function
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+# Mettre en cache la fonction de récupération des données
+@st.cache_data(ttl=300)  # Cache par 5 minutes
 def fetch_data():
     try:
         conn = init_connection()
@@ -47,24 +47,24 @@ def fetch_data():
             ORDER BY timestamp DESC
         """
         df = pd.read_sql(query, conn)
-        # Convert timestamp to local timezone
+
         df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert('Europe/Paris')
         return df
+    
     except Exception as e:
         st.error(f"Erreur lors de la récupération des données : {str(e)}")
         return pd.DataFrame()
 
-# Function to get unique device names
+# Mettre en cache la fonction de récupération des noms d'appareils
 @st.cache_data
 def get_device_names(df):
     return sorted(df['device_name'].unique())
 
-# Function to get unique device names
 @st.cache_data
 def get_wifi_database():
     return pd.read_csv(BDD_PATH, delimiter=';', encoding='ISO-8859-1')
 
-# Function to filter dataframe based on selections
+# Fonction pour filtrer le dataframe en fonction des sélections
 def filter_dataframe(df, selected_devices, date_range):
     mask = (
         (df['device_name'].isin(selected_devices)) &
@@ -74,9 +74,8 @@ def filter_dataframe(df, selected_devices, date_range):
     return df[mask]
 
 def process_wifi_networks(networks):
-    # Convert list of dictionaries to DataFrame for better handling
+    # Charger les données JSON dans un DataFrame
     networks_df = pd.DataFrame(networks)
-    # Sort by RSSI strength (less negative is stronger)
     networks_df = networks_df.sort_values('RSSI', ascending=False)
     return networks_df
 
