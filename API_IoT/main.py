@@ -4,11 +4,11 @@ from routers import etudiant
 tags_metadata = [
     {"name": "Racine", "description": "Routes de base"},
     {"name": "Etudiant", "description": "Routes pour gérer les étudiants"},
-    {"name": "Document", "description": "Routes pour gérer les documents"},
     {"name": "Auteur", "description": "Routes pour gérer les auteurs"},
+    {"name": "Document", "description": "Routes pour gérer les documents"},
+    {"name": "Emprunt", "description": "Routes pour gérer les emprunts"},
     {"name": "Bibliotheque", "description": "Routes pour gérer les bibliothèques"},
-    {"name": "Adresse", "description": "Routes pour gérer les adresses"},
-    {"name": "Ville", "description": "Routes pour gérer les villes"},
+    {"name": "Adresse", "description": "Routes pour gérer les adresses et les villes"},
 ]
 
 app = FastAPI(
