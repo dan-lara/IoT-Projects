@@ -1,6 +1,6 @@
 import sqlite3
-
-def get_db(db_path: str = "biblio.db"):
+db_path = "data/biblio.db"
+def get_db():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     try:

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import List
 from sqlite3 import Connection
+
 from models import Etudiant
 from tools import get_db
 

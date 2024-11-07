@@ -1,15 +1,5 @@
 from fastapi import FastAPI
-from routers import etudiants
-import sqlite3
-
-
-def get_db():
-    conn = sqlite3.connect('biblio.db')
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
+from routers import etudiant
 
 tags_metadata = [
     {"name": "Racine", "description": "Routes de base"},
@@ -28,7 +18,7 @@ app = FastAPI(
         openapi_tags=tags_metadata
     )
 
-app.include_router(etudiants.router,tags=["Etudiant"],prefix="/etudiant")
+app.include_router(etudiant.router,tags=["Etudiant"],prefix="/etudiant")
 
 @app.get("/", tags=["Racine"])
 def home():
