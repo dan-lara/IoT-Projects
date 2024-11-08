@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS Bibliotheque;
 DROP TABLE IF EXISTS Etudiant;
 DROP TABLE IF EXISTS Adresse;
 DROP TABLE IF EXISTS Ville;
-DROP TABLE IF EXISTS Emprunte;
+DROP TABLE IF EXISTS Emprunt;
 DROP TABLE IF EXISTS Possede;
 DROP TABLE IF EXISTS Redige;
 
@@ -50,12 +50,12 @@ INSERT INTO Ville VALUES (92140, "Clamart"),
        (93300, "Aubervilliers");
 
 -- Associations
-CREATE TABLE Emprunte (idEtu INTEGER NOT NULL, idDoc INTEGER NOT NULL, Date TEXT NOT NULL, FOREIGN KEY (idEtu) REFERENCES Etudiant(id), FOREIGN KEY (idDoc) REFERENCES Document(id), PRIMARY KEY (idEtu,idDoc));
+CREATE TABLE Emprunt (idEtu INTEGER NOT NULL, idDoc INTEGER NOT NULL, Date TEXT NOT NULL, FOREIGN KEY (idEtu) REFERENCES Etudiant(id), FOREIGN KEY (idDoc) REFERENCES Document(id), PRIMARY KEY (idEtu,idDoc));
 CREATE TABLE Possede (idBibli INTEGER NOT NULL, idDoc INTEGER NOT NULL, Ref TEXT NOT NULL, FOREIGN KEY (idBibli) REFERENCES Bibliotheque(id), FOREIGN KEY (idDoc) REFERENCES Document(id), PRIMARY KEY (idBibli,idDoc));
 CREATE TABLE Redige (idAut INTEGER NOT NULL, idDoc INTEGER NOT NULL, Date TEXT NOT NULL, FOREIGN KEY (idAut) REFERENCES Auteur(id), FOREIGN KEY (idDoc) REFERENCES Document(id), PRIMARY KEY (idAut,idDoc));
 
-INSERT INTO Emprunte VALUES (2, 3, "23/10/2020");
-INSERT INTO Emprunte (idEtu, idDoc, Date)
+INSERT INTO Emprunt VALUES (2, 3, "23/10/2020");
+INSERT INTO Emprunt (idEtu, idDoc, Date)
    SELECT
       (SELECT id FROM Etudiant WHERE Nom = "Onette" AND Prenom = "Marie") as idEtu,
       (SELECT id FROM Document WHERE Titre = "Bases de données concepts, utilisation et développement") as idDoc,
@@ -70,4 +70,4 @@ INSERT INTO Redige VALUES (2, 3, "2010");
 INSERT INTO Redige VALUES (3, 3, "2013");
 
 -- les étudiants qui ont emprunté un document
-SELECT Nom, Prenom FROM Etudiant  INNER JOIN Emprunte ON Etudiant.id = Emprunte.idEtu;
+SELECT Nom, Prenom FROM Etudiant  INNER JOIN Emprunt ON Etudiant.id = Emprunt.idEtu;
