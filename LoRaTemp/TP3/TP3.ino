@@ -8,7 +8,7 @@
 #define APP_EUI "155E688412EB473C"
 #define APP_KEY "3553D5B3A2F8B4A2DD6ED4DA9B68BCA1"
 #define MAX_TRIES 5
-#define DATA_RATE 1 // DOIT ETRE 1 ,2 ,3 ,4 ou 5
+#define DATA_RATE 3 // DOIT ETRE 1 ,2 ,3 ,4 ou 5
 // Création de l'instance du module LoRa avec les informations de configuration
 LoRaModule lora(DEV_EUI, APP_EUI, APP_KEY, LORA_RX, LORA_TX, MAX_TRIES, ("DR"+String(DATA_RATE)));
 
