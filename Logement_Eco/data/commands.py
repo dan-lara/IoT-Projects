@@ -17,8 +17,6 @@ def read_scrpit(file_path: str):
         print(f"Erreur lors de la lecture du fichier SQL: {e}")
         exit(1)
 
-
-
 def run_script(conn, sql_script: str):
     try:
         conn.executescript(sql_script)
@@ -27,8 +25,6 @@ def run_script(conn, sql_script: str):
         print(f"Erreur lors de l'exécution du script SQL: {e}")
     finally:
         conn.close()
-
-
 
 # Lire le fichier SQL
 sql_script = read_scrpit('logement.sql')
