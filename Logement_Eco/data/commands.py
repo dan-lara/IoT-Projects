@@ -31,7 +31,7 @@ def run_script(conn, sql_script: str):
 
 
 # Lire le fichier SQL
-sql_script = read_scrpit('raw.sql')
+sql_script = read_scrpit('logement.sql')
 
 # Connexion à la base de données
 c = get_db('logement.db')
