@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 
-from models import Adresse
+from models.database import Adresse
 from tools import get_db
 
 router = APIRouter()
@@ -14,14 +14,14 @@ def create_adresse(adresse: Adresse, db: Connection = Depends(get_db)):
     cursor = db.execute(query, (adresse.Numero, adresse.Voie, adresse.Nom_voie, adresse.Code))
     db.commit()
     adresse_id = cursor.lastrowid
-    return {**adresse.dict(), "id": adresse_id}
+    return {**adresse, "id": adresse_id}
 
 # Route pour obtenir toutes les adresses, avec un filtre optionnel par nom de voie
 @router.get("/", response_model=List[Adresse], tags=["Adresse"])
 def read_adresses(
     db: Connection = Depends(get_db),
-    Nom_voie: Optional[str] = Query(None, description="Filtrer par nom de la voie")
-):
+    Nom_voie: Optional[str] = Query(None, description="Filtrer par nom de la voie")):
+
     query = "SELECT * FROM Adresse"
     params = []
 
@@ -55,7 +55,7 @@ def update_adresse(id: int, adresse: Adresse, db: Connection = Depends(get_db)):
     query = "UPDATE Adresse SET Numero = ?, Voie = ?, Nom_voie = ?, Code = ? WHERE id = ?"
     db.execute(query, (adresse.Numero, adresse.Voie, adresse.Nom_voie, adresse.Code, id))
     db.commit()
-    return {**adresse.dict(), "id": id}
+    return {**adresse, "id": id}
 
 # Route pour supprimer une adresse par ID, retournant l'adresse supprimée
 @router.delete("/{id}", response_model=dict, tags=["Adresse"])

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
+from datetime import datetime
 
 from models.database import Logement
 from tools import get_db
@@ -11,10 +12,12 @@ router = APIRouter()
 @router.post("/", response_model=Logement, tags=["Logement"])
 def create_logement(logement: Logement, db: Connection = Depends(get_db)):
     query = "INSERT INTO Logement (id_adresse, numero_telephone, adresse_ip, created_at) VALUES (?, ?, ?, ?)"
+    if logement.created_at is None:
+        logement.created_at = datetime.now()
     cursor = db.execute(query, (logement.id_adresse, logement.numero_telephone, logement.adresse_ip, logement.created_at))
     db.commit()
     logement_id = cursor.lastrowid
-    return {**logement.dict(), "id": logement_id}
+    return {**logement, "id": logement_id}
 
 # Route pour obtenir tous les logements, avec des filtres optionnels
 @router.get("/", response_model=List[Logement], tags=["Logement"])
