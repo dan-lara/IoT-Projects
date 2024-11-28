@@ -19,7 +19,7 @@ BASE_URL = os.getenv("BASE_URL")
 templates = Jinja2Templates(directory="templates")
 
 # Route pour obtenir les données météorologiques
-@router.get("/", response_model=WeatherData, tags=["Meteo"])
+@router.get("/data", response_model=WeatherData, tags=["Meteo"])
 async def get_weather(
     postal_code: str = Query(..., description="Code postal pour la requête"),
     country_code: str = Query("fr", description="Code du pays, par défaut 'fr'")
@@ -61,11 +61,11 @@ async def get_weather(
 templates = Jinja2Templates(directory="templates")
 
 # URL de base pour l'API météo
-BACKEND_BASE_URL = "http://localhost:8005/meteo/"  # Remplacez par l'URL correcte de l'API backend
+BACKEND_BASE_URL = "http://localhost:8005/meteo/data/"  # Remplacez par l'URL correcte de l'API backend
 
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/front/", response_class=HTMLResponse, tags=["Meteo"])
+@router.get("/", response_class=HTMLResponse, tags=["Meteo"])
 async def get_weather_page(request: Request, postal_code: str = None, country_code: str = "fr"):
     weather = None
     if postal_code:
