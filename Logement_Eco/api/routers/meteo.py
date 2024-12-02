@@ -85,3 +85,7 @@ async def get_weather_page(request: Request, postal_code: str = None, country_co
 
     # Renderiza a página com os dados ou sem dados se postal_code não for fornecido
     return templates.TemplateResponse("meteo_form.html", {"request": request, "weather": weather})
+
+@router.get("/base", response_class=HTMLResponse, tags=["Meteo"])
+async def read_root(request: Request):
+    return templates.TemplateResponse("base.html", {"request": request})

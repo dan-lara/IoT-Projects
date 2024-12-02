@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from routers import meteo, facture
+from routers import meteo, facture, capteur
 
 # Métadonnées pour la documentation OpenAPI
 tags_metadata = [
@@ -20,3 +20,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(facture.router, tags=["Facture"], prefix="/facture")
 app.include_router(meteo.router, tags=["Meteo"], prefix="/meteo")
+app.include_router(capteur.router, tags=["Capteur"], prefix="/capteur")
