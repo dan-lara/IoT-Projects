@@ -22,7 +22,7 @@ void setup() {
 StaticJsonDocument<JSON_SIZE> prepareJSON_mesure(int id_c, float valeur);
 void loop() {
     if (dht.update()) {
-      if (api.getData()){
+      //if (api.getData()){
         float temperature = dht.getTemperature();
         Serial.print("Température: ");
         Serial.println(temperature);
@@ -34,11 +34,11 @@ void loop() {
         Serial.println(humidity);
 
         api.sendData(prepareJSON_mesure(CAPTEUR_ID+1, humidity), "/mesure/");
-      }
+      /*}
       else{
         Serial.println("Error to find Server");
       }
-
+*/
     }
 }
 
