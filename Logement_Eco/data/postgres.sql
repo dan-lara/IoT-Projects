@@ -41,7 +41,6 @@ CREATE TABLE "Capteur" (
   "ref_commerciale" varchar,
   "precision_min" float(10,2),
   "precision_max" float(10,2),
-  "port_comm" varchar,
   "created_at" timestamp
 );
 

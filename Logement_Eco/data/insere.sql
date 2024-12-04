@@ -33,12 +33,12 @@ INSERT INTO Type_Capteur (nom, unite_mesure, description) VALUES
 ('Eau', 'm³', 'Compteur d''eau');
 
 -- Insertion de Capteurs
-INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, port_comm, created_at) VALUES
-(1, 1, 'TEMP-001', -10.00, 50.00, 'COM3', '2024-01-01 11:00:00'),
-(1, 2, 'TEMP-002', -10.00, 50.00, 'COM4', '2024-01-01 11:01:00'),
-(2, 1, 'HUM-001', 0.00, 100.00, 'COM5', '2024-01-01 11:02:00'),
-(3, 4, 'ELEC-001', 0.00, 10000.00, 'COM6', '2024-01-02 12:30:00'),
-(4, 5, 'EAU-001', 0.00, 1000.00, 'COM7', '2024-01-02 12:31:00');
+INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, created_at) VALUES
+(1, 1, 'TEMP-001', -10.00, 50.00, '2024-01-01 11:00:00'),
+(1, 2, 'TEMP-002', -10.00, 50.00, '2024-01-01 11:01:00'),
+(2, 1, 'HUM-001', 0.00, 100.00, '2024-01-01 11:02:00'),
+(3, 4, 'ELEC-001', 0.00, 10000.00, '2024-01-02 12:30:00'),
+(4, 5, 'EAU-001', 0.00, 1000.00, '2024-01-02 12:31:00');
 
 -- Insertion de Mesures
 INSERT INTO Mesure (id_c, valeur, created_at) VALUES
