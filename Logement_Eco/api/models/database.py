@@ -16,6 +16,10 @@ class Adresse(BaseModel):
     Code: int  # Code de la ville, correspondant à la table Ville
 
 # Modèle pour la table Logement
+class requestLogement(BaseModel):
+    id_adresse: int  # Référence de l'adresse
+    numero_telephone: Optional[str] = None  # Numéro de téléphone du logement
+    adresse_ip: Optional[str] = None  # Adresse IP
 class Logement(BaseModel):
     id: Optional[int] = None  # ID du logement, généré automatiquement
     id_adresse: int  # Référence de l'adresse
@@ -24,6 +28,12 @@ class Logement(BaseModel):
     created_at: Optional[datetime] = None  # Date de création
 
 # Modèle pour la table Piece
+class requestPiece(BaseModel):
+    id_l: int  # Référence du logement
+    nom: str  # Nom de la pièce
+    loc_x: Optional[float] = None  # Position X dans la matrice 3D
+    loc_y: Optional[float] = None  # Position Y dans la matrice 3D
+    loc_z: Optional[float] = None  # Position Z dans la matrice 3D
 class Piece(BaseModel):
     id: Optional[int] = None  # ID de la pièce, généré automatiquement
     id_l: int  # Référence du logement
@@ -41,6 +51,12 @@ class Type_Capteur(BaseModel):
     description: Optional[str] = None  # Description du type de capteur
 
 # Modèle pour la table Capteur
+class requestCapteur(BaseModel):
+    id_tc: int  # Référence du type de capteur
+    id_p: int  # Référence de la pièce
+    ref_commerciale: Optional[str] = None  # Référence commerciale du capteur
+    precision_min: Optional[float] = None  # Précision minimale du capteur
+    precision_max: Optional[float] = None  # Précision maximale du capteur
 class Capteur(BaseModel):
     id: Optional[int] = None  # ID du capteur, généré automatiquement
     id_tc: int  # Référence du type de capteur
@@ -48,10 +64,12 @@ class Capteur(BaseModel):
     ref_commerciale: Optional[str] = None  # Référence commerciale du capteur
     precision_min: Optional[float] = None  # Précision minimale du capteur
     precision_max: Optional[float] = None  # Précision maximale du capteur
-    port_comm: Optional[str] = None  # Port de communication
     created_at: Optional[datetime] = None  # Date de création
 
 # Modèle pour la table Mesure
+class requestMesure(BaseModel):
+    id_c: int  # Référence du capteur
+    valeur: float  # Valeur mesurée par le capteur
 class Mesure(BaseModel):
     id: Optional[int] = None  # ID de la mesure, généré automatiquement
     id_c: int  # Référence du capteur
@@ -65,6 +83,12 @@ class Type_Facture(BaseModel):
     description: Optional[str] = None  # Description du type de facture
 
 # Modèle pour la table Facture
+class requestFacture(BaseModel):
+    id_l: int  # Référence du logement
+    id_tc: int  # Référence du type de facture
+    date_facture: datetime  # Date de la facture
+    montant: Optional[float] = None  # Montant de la facture
+    valeur_consommee: Optional[float] = None  # Valeur consommée
 class Facture(BaseModel):
     id: Optional[int] = None  # ID de la facture, généré automatiquement
     id_l: int  # Référence du logement
