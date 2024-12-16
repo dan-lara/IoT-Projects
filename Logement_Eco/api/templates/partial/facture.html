@@ -37,7 +37,7 @@
         <!-- Filtro de Logement -->
         <div class="row mb-4">
             <div class="col-md-6 offset-md-3">
-                <form class="d-flex" method="GET">
+                <form class="d-flex" method="GET"  onsubmit="return validateForm()">
                     <select name="id_l" class="form-select me-2">
                         <option value="">Tous les logements</option>
                         {% for logement in logements %}

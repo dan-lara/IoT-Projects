@@ -4,21 +4,21 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Météo à Paris</title>
-        <link rel="stylesheet" href="/static/meteo_style.css">
+        <link rel="stylesheet" href="/static/css/meteo_style.css">
     </head>
 <body>
     <h1>Formulaire pour Obtenir la Météo</h1>
 
-    <!-- Formulário para enviar o código postal -->
-    <form method="get" action="/meteo/">
+    <form method="get" action="/meteo/" onsubmit="return validateForm()">
         <label for="postal_code">Code postal :</label>
-        <input type="text" id="postal_code" name="postal_code" required placeholder="Ex: 75001" value="{{ postal_code }}">
-
+        <input type="text" id="postal_code" name="postal_code" required placeholder="Ex: 75001">
+    
         <label for="country_code">Code du pays :</label>
-        <input type="text" id="country_code" name="country_code" value="{{ country_code }}" required placeholder="fr">
-
+        <input type="text" id="country_code" name="country_code" value="fr" required>
+    
         <button type="submit">Obtenir la météo</button>
     </form>
+    
     <div class="info">
         {% if weather %}
             <h2>Informations Météo :</h2>
