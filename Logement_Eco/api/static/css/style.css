@@ -1,0 +1,18 @@
+body {
+    background-color: #f0fdf4; /* Vert pâle pour le fond */
+    color: #155724; /* Vert foncé pour le texte */
+}
+.navbar, .footer {
+    background-color: #28a745; /* Vert principal */
+    color: white;
+}
+.navbar a, .footer a {
+    color: white;
+}
+.btn-green {
+    background-color: #28a745; /* Vert principal */
+    color: white;
+}
+.btn-green:hover {
+    background-color: #218838; /* Vert plus foncé au survol */
+}   
