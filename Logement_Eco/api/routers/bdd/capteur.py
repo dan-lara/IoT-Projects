@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/", response_model=Capteur, tags=["Capteur"])
 def create_capteur(capteur: Capteur, db: Connection = Depends(get_db)):
     query = """
-    INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, port_comm, created_at)
+    INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
     """
     if capteur.created_at is None:
@@ -19,7 +19,7 @@ def create_capteur(capteur: Capteur, db: Connection = Depends(get_db)):
     cursor = db.execute(
         query, 
         (capteur.id_tc, capteur.id_p, capteur.ref_commerciale, capteur.precision_min, 
-         capteur.precision_max, capteur.port_comm, capteur.created_at)
+         capteur.precision_max, capteur.created_at)
     )
     db.commit()
     capteur_id = cursor.lastrowid
@@ -52,7 +52,7 @@ def read_capteurs(
             "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
             "ref_commerciale": row["ref_commerciale"], 
             "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-            "port_comm": row["port_comm"], "created_at": row["created_at"]
+            "created_at": row["created_at"]
         } for row in cursor.fetchall()
     ]
 
@@ -67,7 +67,7 @@ def read_capteur(id: int, db: Connection = Depends(get_db)):
         "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
         "ref_commerciale": row["ref_commerciale"], 
         "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-        "port_comm": row["port_comm"], "created_at": row["created_at"]
+        "created_at": row["created_at"]
     }
 
 # Route pour mettre à jour un capteur spécifique par ID
@@ -81,7 +81,7 @@ def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
     db.execute(
         query, 
         (capteur.id_tc, capteur.id_p, capteur.ref_commerciale, capteur.precision_min, 
-         capteur.precision_max, capteur.port_comm, capteur.created_at, id)
+         capteur.precision_max, capteur.created_at, id)
     )
     db.commit()
 
@@ -93,7 +93,7 @@ def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
         "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
         "ref_commerciale": row["ref_commerciale"], 
         "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-        "port_comm": row["port_comm"], "created_at": row["created_at"]
+        "created_at": row["created_at"]
     }
 
 # Route pour supprimer un capteur spécifique par ID
@@ -112,6 +112,6 @@ def delete_capteur(id: int, db: Connection = Depends(get_db)):
             "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
             "ref_commerciale": row["ref_commerciale"], 
             "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-            "port_comm": row["port_comm"], "created_at": row["created_at"]
+            "created_at": row["created_at"]
         }
     }
