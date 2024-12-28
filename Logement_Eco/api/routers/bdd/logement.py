@@ -3,8 +3,8 @@ from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
 
-from models.database import Logement
-from tools import get_db
+from ...models.database import Logement
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -17,6 +17,7 @@ def create_logement(logement: Logement, db: Connection = Depends(get_db)):
     cursor = db.execute(query, (logement.id_adresse, logement.numero_telephone, logement.adresse_ip, logement.created_at))
     db.commit()
     logement_id = cursor.lastrowid
+    cursor.close()
     return {**logement, "id": logement_id}
 
 # Route pour obtenir tous les logements, avec des filtres optionnels
@@ -38,14 +39,17 @@ def read_logements(
         params.append(numero_telephone)
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [{"id": row["id"], "id_adresse": row["id_adresse"], "numero_telephone": row["numero_telephone"],
-             "adresse_ip": row["adresse_ip"], "created_at": row["created_at"]} for row in cursor.fetchall()]
+             "adresse_ip": row["adresse_ip"], "created_at": row["created_at"]} for row in rows]
 
 # Route pour obtenir un logement spécifique par ID
 @router.get("/{id}", response_model=Logement, tags=["Logement"])
 def read_logement(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Logement WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Logement non trouvé")
     return {"id": row["id"], "id_adresse": row["id_adresse"], "numero_telephone": row["numero_telephone"],
@@ -60,6 +64,7 @@ def update_logement(id: int, logement: Logement, db: Connection = Depends(get_db
 
     cursor = db.execute("SELECT * FROM Logement WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Logement non trouvé")
     return {"id": row["id"], "id_adresse": row["id_adresse"], "numero_telephone": row["numero_telephone"],
@@ -70,6 +75,7 @@ def update_logement(id: int, logement: Logement, db: Connection = Depends(get_db
 def delete_logement(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Logement WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Logement non trouvé")
 

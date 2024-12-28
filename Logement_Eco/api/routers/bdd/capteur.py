@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
-from models.database import Capteur
-from tools import get_db
+from ...models.database import Capteur
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -23,6 +23,7 @@ def create_capteur(capteur: Capteur, db: Connection = Depends(get_db)):
     )
     db.commit()
     capteur_id = cursor.lastrowid
+    cursor.close()
     return {**capteur, "id": capteur_id}
 
 # Route pour obtenir tous les capteurs, avec des filtres optionnels
@@ -47,13 +48,15 @@ def read_capteurs(
         query += " WHERE " + " AND ".join(filters)
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [
         {
             "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
             "ref_commerciale": row["ref_commerciale"], 
             "precision_min": row["precision_min"], "precision_max": row["precision_max"],
             "created_at": row["created_at"]
-        } for row in cursor.fetchall()
+        } for row in rows
     ]
 
 # Route pour obtenir un capteur spécifique par ID
@@ -61,6 +64,7 @@ def read_capteurs(
 def read_capteur(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Capteur non trouvé")
     return {
@@ -84,9 +88,9 @@ def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
          capteur.precision_max, capteur.created_at, id)
     )
     db.commit()
-
     cursor = db.execute("SELECT * FROM Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Capteur non trouvé")
     return {
@@ -101,6 +105,7 @@ def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
 def delete_capteur(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Capteur non trouvé")
 

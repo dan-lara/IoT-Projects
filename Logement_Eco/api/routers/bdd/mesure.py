@@ -3,8 +3,8 @@ from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
 
-from models.database import Mesure, requestMesure
-from tools import get_db
+from ...models.database import Mesure, requestMesure
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -22,6 +22,7 @@ def create_mesure(mesure: requestMesure, db: Connection = Depends(get_db)):
     cursor = db.execute(query, (mesure.id_c, mesure.valeur, mesure.created_at))
     db.commit()
     mesure_id = cursor.lastrowid
+    cursor.close()
     return {**mesure.__dict__, "id": mesure_id}
 
 # Route pour obtenir toutes les mesures, avec des filtres optionnels
@@ -37,11 +38,13 @@ def read_mesures(
         params.append(id_c)
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [
         {
             "id": row["id"], "id_c": row["id_c"], 
             "valeur": row["valeur"], "created_at": row["created_at"]
-        } for row in cursor.fetchall()
+        } for row in rows
     ]
 
 # Route pour obtenir une mesure spécifique par ID
@@ -49,6 +52,7 @@ def read_mesures(
 def read_mesure(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Mesure WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Mesure non trouvée")
     return {
@@ -69,6 +73,7 @@ def update_mesure(id: int, mesure: Mesure, db: Connection = Depends(get_db)):
 
     cursor = db.execute("SELECT * FROM Mesure WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Mesure non trouvée")
     return {
@@ -81,6 +86,7 @@ def update_mesure(id: int, mesure: Mesure, db: Connection = Depends(get_db)):
 def delete_mesure(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Mesure WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Mesure non trouvée")
 

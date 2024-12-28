@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 
-from models.database import Type_Facture
-from tools import get_db
+from ...models.database import Type_Facture
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -17,6 +17,7 @@ def create_type_facture(type_facture: Type_Facture, db: Connection = Depends(get
     cursor = db.execute(query, (type_facture.nom, type_facture.description))
     db.commit()
     type_facture_id = cursor.lastrowid
+    cursor.close()
     return {**type_facture, "id": type_facture_id}
 
 # Route pour obtenir tous les types de factures, avec des filtres optionnels
@@ -32,9 +33,11 @@ def read_type_factures(
         params.append(nom)
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [
         {"id": row["id"], "nom": row["nom"], "description": row["description"]}
-        for row in cursor.fetchall()
+        for row in rows
     ]
 
 # Route pour obtenir un type de facture spécifique par ID
@@ -42,6 +45,7 @@ def read_type_factures(
 def read_type_facture(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Type_Facture WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Type de facture non trouvé")
     return {"id": row["id"], "nom": row["nom"], "description": row["description"]}
@@ -59,6 +63,7 @@ def update_type_facture(id: int, type_facture: Type_Facture, db: Connection = De
 
     cursor = db.execute("SELECT * FROM Type_Facture WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Type de facture non trouvé")
     return {"id": row["id"], "nom": row["nom"], "description": row["description"]}
@@ -73,6 +78,7 @@ def delete_type_facture(id: int, db: Connection = Depends(get_db)):
 
     db.execute("DELETE FROM Type_Facture WHERE id = ?", (id,))
     db.commit()
+    cursor.close()
     return {
         "message": "Type de facture supprimé avec succès",
         "deleted_type_facture": {"id": row["id"], "nom": row["nom"], "description": row["description"]}

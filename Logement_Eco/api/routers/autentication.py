@@ -66,7 +66,7 @@ async def verify_api_key(api_key: Optional[str] = Depends(APIKeyHeader(name="X-A
 
 
 from fastapi import APIRouter, Depends
-from models.database import Mesure
+from ...models.database import Mesure
 @router.post("/api-key", response_model=Mesure, tags=["Mesure"])
 def create_mesure(
     mesure: Mesure,

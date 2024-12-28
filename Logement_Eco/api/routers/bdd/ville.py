@@ -2,23 +2,28 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List
 from sqlite3 import Connection
 
-from models.database import Ville
-from tools import get_db
+from ...models.database import Ville
+from ...tools import get_db
 
 router = APIRouter()
+
 # Route pour créer une nouvelle ville
 @router.post("/", response_model=Ville, tags=["Ville"])
 def create_ville(ville: Ville, db: Connection = Depends(get_db)):
     query = "INSERT INTO Ville (Code, Nom) VALUES (?, ?)"
     try:
-        db.execute(query, (ville.Code, ville.Nom))
+        cursor = db.execute(query, (ville.Code, ville.Nom))
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Erreur lors de la création de la ville : {e}")
-    return ville
+    # return ville
+    return {"Code": ville.Code, "Nom": ville.Nom}
 
 #Route pour obtenir toutes les villes, avec un filtre optionnel par nom
 @router.get("/", response_model=List[Ville], tags=["Ville"])
+# def read_villes(db: SessionLocal = Depends(get_db_alchemy), Nom: str = Query(None, description="Filtrer par nom de la ville")):
 def read_villes(db: Connection = Depends(get_db), Nom: str = Query(None, description="Filtrer par nom de la ville")):
     query = "SELECT * FROM Ville"
     params = []
@@ -29,9 +34,13 @@ def read_villes(db: Connection = Depends(get_db), Nom: str = Query(None, descrip
         params.append(f"%{Nom}%")
 
     cursor = db.execute(query, params)
+    db.commit()
+    rows = cursor.fetchall()
+    cursor.close()
+    db.close()
     return [
         {"Code": row["Code"], "Nom": row["Nom"]}
-        for row in cursor.fetchall()
+        for row in rows
     ]
 
 # Route pour obtenir une ville spécifique par Code
@@ -39,6 +48,8 @@ def read_villes(db: Connection = Depends(get_db), Nom: str = Query(None, descrip
 def read_ville(code: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Ville WHERE Code = ?", (code,))
     row = cursor.fetchone()
+    cursor.close()
+    db.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Ville non trouvée")
     return {"Code": row["Code"], "Nom": row["Nom"]}
@@ -52,6 +63,8 @@ def update_ville(code: int, ville: Ville, db: Connection = Depends(get_db)):
 
     cursor = db.execute("SELECT * FROM Ville WHERE Code = ?", (code,))
     row = cursor.fetchone()
+    cursor.close()
+    db.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Ville non trouvée")
     return {"Code": row["Code"], "Nom": row["Nom"]}
@@ -61,9 +74,11 @@ def update_ville(code: int, ville: Ville, db: Connection = Depends(get_db)):
 def delete_ville(code: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Ville WHERE Code = ?", (code,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Ville non trouvée")
 
     db.execute("DELETE FROM Ville WHERE Code = ?", (code,))
     db.commit()
+    db.close()
     return {"message": "Ville supprimée avec succès", "deleted_ville": {"Code": row["Code"], "Nom": row["Nom"]}}

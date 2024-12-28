@@ -3,8 +3,8 @@ from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
 
-from models.database import Piece
-from tools import get_db
+from ...models.database import Piece
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -20,7 +20,8 @@ def create_piece(piece: Piece, db: Connection = Depends(get_db)):
     cursor = db.execute(query, (piece.id_l, piece.nom, piece.loc_x, piece.loc_y, piece.loc_z, piece.created_at))
     db.commit()
     piece_id = cursor.lastrowid
-    return {**piece, "id": piece_id, "created_at": created_at}
+    cursor.close()
+    return {**piece, "id": piece_id, "created_at": piece.created_at}
 
 # Route pour obtenir toutes les pièces, avec des filtres optionnels par id_l ou nom
 @router.get("/", response_model=List[Piece], tags=["Piece"])
@@ -40,15 +41,18 @@ def read_pieces(
         params.append(f"%{nom}%")
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [{"id": row["id"], "id_l": row["id_l"], "nom": row["nom"], 
              "loc_x": row["loc_x"], "loc_y": row["loc_y"], "loc_z": row["loc_z"],
-             "created_at": row["created_at"]} for row in cursor.fetchall()]
+             "created_at": row["created_at"]} for row in rows]
 
 # Route pour obtenir une pièce spécifique par ID
 @router.get("/{id}", response_model=Piece, tags=["Piece"])
 def read_piece(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Piece WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Pièce non trouvée")
     return {"id": row["id"], "id_l": row["id_l"], "nom": row["nom"], 
@@ -67,6 +71,7 @@ def update_piece(id: int, piece: Piece, db: Connection = Depends(get_db)):
 
     cursor = db.execute("SELECT * FROM Piece WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Pièce non trouvée")
     return {"id": row["id"], "id_l": row["id_l"], "nom": row["nom"], 
@@ -78,6 +83,7 @@ def update_piece(id: int, piece: Piece, db: Connection = Depends(get_db)):
 def delete_piece(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Piece WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Pièce non trouvée")
 

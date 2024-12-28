@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
-from models.database import Facture
-from tools import get_db
+from ...models.database import Facture
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -24,6 +24,7 @@ def create_facture(facture: Facture, db: Connection = Depends(get_db)):
     ))
     db.commit()
     facture_id = cursor.lastrowid
+    cursor.close()
     return {**facture.dict(), "id": facture_id}
 
 # Route pour obtenir toutes les factures, avec filtres optionnels
@@ -43,6 +44,8 @@ def read_factures(
         params.append(id_tc)
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [
         {
             "id": row["id"],
@@ -53,7 +56,7 @@ def read_factures(
             "valeur_consommee": row["valeur_consommee"],
             "created_at": row["created_at"]
         }
-        for row in cursor.fetchall()
+        for row in rows
     ]
 
 # Route pour obtenir une facture spécifique par ID
@@ -61,6 +64,7 @@ def read_factures(
 def read_facture(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Facture WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Facture non trouvée")
     return {
@@ -94,6 +98,7 @@ def update_facture(id: int, facture: Facture, db: Connection = Depends(get_db)):
 
     cursor = db.execute("SELECT * FROM Facture WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Facture non trouvée")
     return {
@@ -111,6 +116,7 @@ def update_facture(id: int, facture: Facture, db: Connection = Depends(get_db)):
 def delete_facture(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Facture WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Facture non trouvée")
 

@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 
-from models.database import Type_Capteur
-from tools import get_db
+from ...models.database import Type_Capteur
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -17,6 +17,7 @@ def create_type_capteur(type_capteur: Type_Capteur, db: Connection = Depends(get
     cursor = db.execute(query, (type_capteur.nom, type_capteur.unite_mesure, type_capteur.description))
     db.commit()
     type_capteur_id = cursor.lastrowid
+    cursor.close()
     return {**type_capteur, "id": type_capteur_id}
 
 # Route pour obtenir tous les types de capteurs, avec un filtre optionnel par nom
@@ -33,14 +34,17 @@ def read_types_capteurs(
         params.append(f"%{nom}%")
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
     return [{"id": row["id"], "nom": row["nom"], "unite_mesure": row["unite_mesure"], 
-             "description": row["description"]} for row in cursor.fetchall()]
+             "description": row["description"]} for row in rows]
 
 # Route pour obtenir un type de capteur spécifique par ID
 @router.get("/{id}", response_model=Type_Capteur, tags=["Type_Capteur"])
 def read_type_capteur(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Type_Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Type de capteur non trouvé")
     return {"id": row["id"], "nom": row["nom"], "unite_mesure": row["unite_mesure"], 
@@ -58,6 +62,7 @@ def update_type_capteur(id: int, type_capteur: Type_Capteur, db: Connection = De
 
     cursor = db.execute("SELECT * FROM Type_Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Type de capteur non trouvé")
     return {"id": row["id"], "nom": row["nom"], "unite_mesure": row["unite_mesure"], 
@@ -68,6 +73,7 @@ def update_type_capteur(id: int, type_capteur: Type_Capteur, db: Connection = De
 def delete_type_capteur(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Type_Capteur WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Type de capteur non trouvé")
 

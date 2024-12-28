@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 
-from models.database import Adresse
-from tools import get_db
+from ...models.database import Adresse
+from ...tools import get_db
 
 router = APIRouter()
 
@@ -14,6 +14,8 @@ def create_adresse(adresse: Adresse, db: Connection = Depends(get_db)):
     cursor = db.execute(query, (adresse.Numero, adresse.Voie, adresse.Nom_voie, adresse.Code))
     db.commit()
     adresse_id = cursor.lastrowid
+    cursor.close()
+    db.close()
     return {**adresse, "id": adresse_id}
 
 # Route pour obtenir toutes les adresses, avec un filtre optionnel par nom de voie
@@ -31,9 +33,12 @@ def read_adresses(
         params.append(f"%{Nom_voie}%")
 
     cursor = db.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
+    db.close()
     return [
         {"id": row["id"], "Numero": row["Numero"], "Voie": row["Voie"], "Nom_voie": row["Nom_voie"], "Code": row["Code"]}
-        for row in cursor.fetchall()
+        for row in rows
     ]
 
 # Route pour obtenir une adresse spécifique par ID
@@ -41,6 +46,8 @@ def read_adresses(
 def read_adresse(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Adresse WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
+    db.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Adresse non trouvée")
     return {"id": row["id"], "Numero": row["Numero"], "Voie": row["Voie"], "Nom_voie": row["Nom_voie"], "Code": row["Code"]}
@@ -51,10 +58,11 @@ def update_adresse(id: int, adresse: Adresse, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Adresse WHERE id = ?", (id,))
     if cursor.fetchone() is None:
         raise HTTPException(status_code=404, detail="Adresse non trouvée")
-
     query = "UPDATE Adresse SET Numero = ?, Voie = ?, Nom_voie = ?, Code = ? WHERE id = ?"
     db.execute(query, (adresse.Numero, adresse.Voie, adresse.Nom_voie, adresse.Code, id))
     db.commit()
+    cursor.close()
+    db.close()    
     return {**adresse, "id": id}
 
 # Route pour supprimer une adresse par ID, retournant l'adresse supprimée
@@ -62,11 +70,13 @@ def update_adresse(id: int, adresse: Adresse, db: Connection = Depends(get_db)):
 def delete_adresse(id: int, db: Connection = Depends(get_db)):
     cursor = db.execute("SELECT * FROM Adresse WHERE id = ?", (id,))
     row = cursor.fetchone()
+    cursor.close()
     if row is None:
         raise HTTPException(status_code=404, detail="Adresse non trouvée")
 
     db.execute("DELETE FROM Adresse WHERE id = ?", (id,))
     db.commit()
+    db.close()
     return {
         "message": "Adresse supprimée avec succès",
         "deleted_adresse": {
