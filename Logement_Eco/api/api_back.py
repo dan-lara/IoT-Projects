@@ -1,9 +1,5 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-import random
-
-from routers.bdd import ville, adresse, logement, piece, type_capteur, capteur, mesure, type_facture, facture
+from fastapi import FastAPI
+from .routers.bdd import ville, adresse, logement, piece, type_capteur, capteur, mesure, type_facture, facture
 # from routers import autentication
 
 # Métadonnées pour la documentation OpenAPI
@@ -28,7 +24,7 @@ app = FastAPI(
     version="0.1.0",
     openapi_tags=tags_metadata
 )
-templates = Jinja2Templates(directory="templates")
+
 # Route principale pour tester l'api
 @app.get("/", tags=["Racine"])
 def health_check():
