@@ -64,6 +64,7 @@ class Capteur(BaseModel):
     ref_commerciale: Optional[str] = None  # Référence commerciale du capteur
     precision_min: Optional[float] = None  # Précision minimale du capteur
     precision_max: Optional[float] = None  # Précision maximale du capteur
+    actif: Optional[bool] = None  # Capteur actif ou non
     created_at: Optional[datetime] = None  # Date de création
 
 # Modèle pour la table Mesure
@@ -74,6 +75,12 @@ class Mesure(BaseModel):
     id: Optional[int] = None  # ID de la mesure, généré automatiquement
     id_c: int  # Référence du capteur
     valeur: float  # Valeur mesurée par le capteur
+    created_at: Optional[datetime] = None  # Date de création
+class MesureInsert(BaseModel):
+    id: Optional[int] = None  # ID de la mesure, généré automatiquement
+    id_c: int  # Référence du capteur
+    valeur: float  # Valeur mesurée par le capteur
+    status_capteur: Optional[bool] = None  # Statut du capteur
     created_at: Optional[datetime] = None  # Date de création
 
 # Modèle pour la table Type_Facture

@@ -3,27 +3,29 @@ from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
 
-from ...models.database import Mesure, requestMesure
+from ...models.database import Mesure, requestMesure, MesureInsert
 from ...tools import get_db
+from .capteur import read_capteur
 
 router = APIRouter()
 
 # Route pour créer une nouvelle mesure
-@router.post("/", response_model=Mesure, tags=["Mesure"])
+@router.post("/", response_model=MesureInsert, tags=["Mesure"])
 def create_mesure(mesure: requestMesure, db: Connection = Depends(get_db)):
     query = """
     INSERT INTO Mesure (id_c, valeur, created_at)
     VALUES (?, ?, ?)
     """
-    # if mesure.created_at is None:
-    #     mesure.created_at = datetime.now()
-    mesure = Mesure(id_c=mesure.id_c, valeur=mesure.valeur)
+    mesure = MesureInsert(id_c=mesure.id_c, valeur=mesure.valeur)
     mesure.created_at = datetime.now().isoformat() + "Z"
     cursor = db.execute(query, (mesure.id_c, mesure.valeur, mesure.created_at))
     db.commit()
     mesure_id = cursor.lastrowid
     cursor.close()
-    return {**mesure.__dict__, "id": mesure_id}
+    status = read_capteur(mesure.id_c, db).get("actif", None)
+    mesure.status_capteur = status
+    db.close()
+    return {**mesure.__dict__, "status": status, "id": mesure_id}
 
 # Route pour obtenir toutes les mesures, avec des filtres optionnels
 @router.get("/", response_model=List[Mesure], tags=["Mesure"])

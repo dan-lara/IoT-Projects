@@ -55,7 +55,7 @@ def read_capteurs(
             "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
             "ref_commerciale": row["ref_commerciale"], 
             "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-            "created_at": row["created_at"]
+            "actif": row["actif"], "created_at": row["created_at"]
         } for row in rows
     ]
 
@@ -71,7 +71,7 @@ def read_capteur(id: int, db: Connection = Depends(get_db)):
         "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
         "ref_commerciale": row["ref_commerciale"], 
         "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-        "created_at": row["created_at"]
+        "actif": row["actif"], "created_at": row["created_at"]
     }
 
 # Route pour mettre à jour un capteur spécifique par ID
@@ -97,7 +97,7 @@ def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
         "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
         "ref_commerciale": row["ref_commerciale"], 
         "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-        "created_at": row["created_at"]
+        "actif": row["actif"], "created_at": row["created_at"]
     }
 
 # Route pour supprimer un capteur spécifique par ID
@@ -117,6 +117,6 @@ def delete_capteur(id: int, db: Connection = Depends(get_db)):
             "id": row["id"], "id_tc": row["id_tc"], "id_p": row["id_p"],
             "ref_commerciale": row["ref_commerciale"], 
             "precision_min": row["precision_min"], "precision_max": row["precision_max"],
-            "created_at": row["created_at"]
+            "actif": row["actif"], "created_at": row["created_at"]
         }
     }

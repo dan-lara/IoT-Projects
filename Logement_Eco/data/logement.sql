@@ -61,6 +61,7 @@ CREATE TABLE Capteur (
     ref_commerciale VARCHAR(100),
     precision_min FLOAT,
     precision_max FLOAT,
+    actif BOOLEAN DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_tc) REFERENCES Type_Capteur(id),
     FOREIGN KEY (id_p) REFERENCES Piece(id)
