@@ -13,7 +13,7 @@ Ce projet est une API pour la gestion des étudiants et des livres dans une bibl
 
 1. Clonez le dépôt:
     ```sh
-    git clone <URL_DU_DEPOT>
+    git clone https://github.com/dan-lara/IoT-Projects.git
     cd API_IoT
     ```
 
@@ -32,7 +32,7 @@ Ce projet est une API pour la gestion des étudiants et des livres dans une bibl
 
 1. Clonez le dépôt:
     ```sh
-    git clone <URL_DU_DEPOT>
+    git clone https://github.com/dan-lara/IoT-Projects.git
     cd API_IoT
     ```
 
