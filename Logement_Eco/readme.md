@@ -91,21 +91,27 @@ Le projet est divisé en 4 modules principaux :
 
 # Fonctionnalités Détaillées 📋
 
-### 1. Monitoring Énergétique
-[Description détaillée]
+### 1. Accueil
+Sur la page d'accueil, les utilisateurs peuvent visualiser les macros pour le logement sélectionné et passer aux autres pages.
 
-### 2. Gestion des Capteurs
-[Description détaillée]
+### 2. Dashboard
+Sur le tableau de bord, vous pouvez visualiser les capteurs, les activer et les désactiver individuellement et sélectionner un capteur pour afficher un graphique dynamique de ses mesures.
 
-### 3. Analyse des Données
-[Description détaillée]
+### 3. Économies
+Page permettant d'afficher des graphiques à barres de chaque type de facture au fil du temps, ainsi que le montant total payé et le nombre de factures, et enfin une visualisation des proportions des types de comptes dans le coût total.
 
-### 4. Interface Utilisateur
-[Description détaillée]
+### 4. Logement
+Sur cette page, nous pouvons voir les macros pour chaque logement d'utilisateur et les sélectionner individuellement pour voir les données sur les autres pages.
+
+### 5. Configuration
+Dans les paramètres, nous pouvons voir les clés api, les copier, en créer de nouvelles, les supprimer et nous déconnecter.
 
 ## Problèmes Résolus et Défis 💪
-- [Liste des défis techniques rencontrés]
-- [Solutions implémentées]
+Les principaux problèmes rencontrés sont liés aux technologies choisies, l'utilisation de sqlite3 pour faire les requêtes s'est avérée mauvaise, car un moteur avec sqlalchemy serait plus efficace. 
+
+En raison de mon choix initial de Backend, je n'ai pas pu migrer le projet front-end vers le mode react first et j'ai réalisé qu'il serait beaucoup plus rapide avec cette technologie, en raison de sa resuabilité et de la large gamme de bibliothèques qui accéléreraient le travail.
+
+Dans tous les cas, en utilisant jinja et fastapi, il a été possible de construire une solution fonctionnelle et générique avec l'utilisation de cookies, d'authentification et d'api_keys d'une manière intéressante en pensant que tout était implémenté et que les connexions étaient faites à la main.
 
 # Comment Contribuer 🤝
 1. Forker le projet
@@ -158,15 +164,16 @@ Ce module gère toute la couche backend et l'API REST du projet.
 
 #### Composants Principaux :
 - **api_back.py** : Serveur principal et point d'entrée de l'API
+  - Il contient toutes les routes pour les requêtes à la banque, ainsi que l'authentification. Il est très pratique et contient toutes les routes possibles ainsi que des roues génériques.
 - **api_front.py** : Gestion des routes pour l'interface utilisateur
+  - Routes comme déjà expliquées pour les tests initiaux utilisant l'api externe pour la météorologie
 - **authentication.py** : Gestion de l'authentification
 
 #### Sous-modules :
 - **📁models** : Définition des modèles de données avec **pydantic**
 - **📁routers** : Gestion des routes API
-  - Rotas de BDD: Metodos Post, Getall, Get, pUT e delete para cada tabela
-  - 
-- **📁bdd** : Gestionnaires de base de données spécifiques
+  - Routes BDD : méthodes Post, Getall, Get, Put et delete pour chaque table
+  - Routes Facture et Meteo : Définir le front-end initial réalisé dans les premières séances comme proposé dans le projet.
 
 ## 2. Module Data (`/data`)
 Responsable de la gestion des données et de la structure de la base de données.
@@ -188,7 +195,10 @@ Responsable de la gestion des données et de la structure de la base de données
 - **auth.db** : Base de données d'authentification
 - **logement.sql** : Schéma de la base de données
 - **insere.sql** : Scripts d'insertion des données initiales
-- **schema.png** : Visualisation du schéma de la base de données
+- **schema.png** : Visualisation du schéma de la base de données du Logement
+
+Logement![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/logement.png)
+Auth![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/auth.png)
 
 ## 3. Module Frontend (`/front`)
 Interface utilisateur complète du projet.
