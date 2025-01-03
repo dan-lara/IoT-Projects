@@ -197,8 +197,14 @@ Responsable de la gestion des données et de la structure de la base de données
 - **insere.sql** : Scripts d'insertion des données initiales
 - **schema.png** : Visualisation du schéma de la base de données du Logement
 
-Logement![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/logement.png)
-Auth![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/auth.png)
+Logement
+
+![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/logement.png)
+
+
+Auth
+
+![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/data/auth.png)
 
 ## 3. Module Frontend (`/front`)
 Interface utilisateur complète du projet.
@@ -237,8 +243,13 @@ Interface utilisateur complète du projet.
 #### Structure :
 - **📁static** : Ressources statiques (CSS, JS, images)
 - **📁templates** : Templates HTML
-- **api.py** : Interface avec l'API backend
-- **tools.py** : Utilitaires frontend
+  - Le modèle d'index gère le thème, certains cookies et la barre de navigation, ainsi que le mode sombre, qui est importé dans tous les autres modèles afin que les pages restent standardisées.
+  - Chacun des autres chemins est lié à un autre chemin sur le site.
+- **api.py** : Interface avec l'API pour le Front et Back-For-Frony
+- **tools.py** : Utilitaires universels
+- **📁routers** : Fichiers qui configurent tous les routes et plus
+  - **Pages.py** : Fichier qui organise la prise en charge des fonctions bff pour placer les données dans le modèle et renvoyer la page HTML.
+  - **bff.py** : Fichier étendu complet de toutes les fonctions pertinentes pour communiquer avec le backend via des appels d'api, la validation et le formatage des données, de nouvelles requêtes spéciales pour la visualisation des données. Il est également accessible via l'API pour le débogage de la démo.
 
 #### Pages Principales :
 - accueil.html
@@ -296,7 +307,7 @@ pip install -r requirements.txt
 - Documentation OpenAPI disponible
 
 ### Frontend
-- HTML5/CSS3/JavaScript
+- HTML5/CSS3/JavaScript/Bootstrap
 - Support des thèmes clair/sombre
 - Interface responsive avec bootstrap
 - Documentation OpenAPI disponible
