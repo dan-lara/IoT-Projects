@@ -122,24 +122,24 @@ def validate_api_key(api_key: str) -> bool:
         return result is not None
 
 
-if __name__ == "__main__":
-    init_auth_db()
-    print("Authentication database initialized")
+# if __name__ == "__main__":
+#     init_auth_db()
+#     print("Authentication database initialized")
 
-    create_user("admin", "admin")
-    print("User created: admin")
-    jwt_admin = authenticate_user("admin", "admin")
-    jwt_invalid = authenticate_user("admin", "wrong")
-    print("JWT token for admin:", jwt_admin)
-    print("JWT token for invalid credentials:", jwt_invalid)
-    print("Decoding JWT token:", decode_jwt(jwt_admin))
-    print("Decoding invalid JWT token:", decode_jwt(jwt_invalid))
+#     create_user("admin", "admin")
+#     print("User created: admin")
+#     jwt_admin = authenticate_user("admin", "admin")
+#     jwt_invalid = authenticate_user("admin", "wrong")
+#     print("JWT token for admin:", jwt_admin)
+#     print("JWT token for invalid credentials:", jwt_invalid)
+#     print("Decoding JWT token:", decode_jwt(jwt_admin))
+#     print("Decoding invalid JWT token:", decode_jwt(jwt_invalid))
 
-    print("-" * 20)
-    print("API key creation and validation")
-    key = create_api_key("ESP32", "First microcontroller")
-    print(f"API key created: {key}")
-    print("Validating key:", validate_api_key(key))
+#     print("-" * 20)
+#     print("API key creation and validation")
+#     key = create_api_key("ESP32", "First microcontroller")
+#     print(f"API key created: {key}")
+#     print("Validating key:", validate_api_key(key))
 
 
     

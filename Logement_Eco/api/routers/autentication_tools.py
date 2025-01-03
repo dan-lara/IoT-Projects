@@ -21,7 +21,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # SQLite database connection
 AUTH_DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/auth.db"))
 
-
 def init_auth_db():
     """Initialize the authentication database."""
     with sqlite3.connect(AUTH_DB_PATH) as conn:
@@ -49,7 +48,6 @@ def init_auth_db():
         )
         """)
         conn.commit()
-
 
 def create_user(username: str, password: str, user_logements: List[int] = None):
     """Create a new user in the authentication database."""
