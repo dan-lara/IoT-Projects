@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 
-from ...models.database import Type_Capteur
+from ...models.database import Type_Capteur, requestType_Capteur
 from ...tools import get_db
 
 router = APIRouter()
 
 # Route pour créer un nouveau type de capteur
 @router.post("/", response_model=Type_Capteur, tags=["Type_Capteur"])
-def create_type_capteur(type_capteur: Type_Capteur, db: Connection = Depends(get_db)):
+def create_type_capteur(type_capteur: requestType_Capteur, db: Connection = Depends(get_db)):
     query = """
     INSERT INTO Type_Capteur (nom, unite_mesure, description)
     VALUES (?, ?, ?)
@@ -52,7 +52,7 @@ def read_type_capteur(id: int, db: Connection = Depends(get_db)):
 
 # Route pour mettre à jour un type de capteur spécifique par ID
 @router.put("/{id}", response_model=Type_Capteur, tags=["Type_Capteur"])
-def update_type_capteur(id: int, type_capteur: Type_Capteur, db: Connection = Depends(get_db)):
+def update_type_capteur(id: int, type_capteur: requestType_Capteur, db: Connection = Depends(get_db)):
     query = """
     UPDATE Type_Capteur SET nom = ?, unite_mesure = ?, description = ?
     WHERE id = ?

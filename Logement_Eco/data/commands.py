@@ -24,9 +24,11 @@ def run_script(conn, sql_script: str):
     except sqlite3.Error as e:
         print(f"Erreur lors de l'exécution du script SQL: {e}")
     finally:
+        conn.commit()
         conn.close()
 
 # Lire le fichier SQL
+# print("Lecture du Logement.sql")
 sql_script = read_scrpit('logement.sql')
 
 # Connexion à la base de données
@@ -36,6 +38,7 @@ c = get_db('logement.db')
 run_script(c, sql_script)
 
 # Lire le fichier SQL
+# print("Lecture du insere.sql")
 sql_script_insert = read_scrpit('insere.sql')
 
 # Connexion à la base de données

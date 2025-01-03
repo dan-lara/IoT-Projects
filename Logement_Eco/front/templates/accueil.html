@@ -1,0 +1,99 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center">{{ username }}, Bienvenue sur votre éco-logements</h1>
+            <p class="text-center lead">Surveillez et optimisez votre consommation</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Mesures</h5>
+                    <p class="display-4">{{ quantite_mesures }}</p>
+                    <p class="card-text">{{ mesures_trend }}% par rapport au mois dernier</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/dashboard" class="btn btn-success btn-sm">Voir les détails</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Économies Réalisées</h5>
+                    <p class="display-4">{{ savings }}€</p>
+                    <p class="card-text">Ce mois-ci</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/economies" class="btn btn-success btn-sm">Voir les économies</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Votre Pieces</h5>
+                    <p class="display-4">{{ quantite_pieces }} pieces</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/logements" class="btn btn-success btn-sm">Voir les logements</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">État des Capteurs</h5>
+                    <p class="display-4">{{ active_sensors }} / {{ total_sensors }}</p>
+                    <p class="card-text">Capteurs actifs</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/dashboard" class="btn btn-success btn-sm">Voir les capteurs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Dernières Mesures</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Pièce</th>
+                                    <th>Type de Capteur</th>
+                                    <th>Valeur</th>
+                                    <th>Date et Heure</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mesure in mesures %}
+                                <tr>
+                                    <td>{{ mesure.id }}</td>
+                                    <td>{{ mesure.piece }}</td>
+                                    <td>{{ mesure.capteur_type }}</td>
+                                    <td>{{ mesure.valeur }} {{ mesure.unite_mesure }}</td>
+                                    <td>{{ mesure.datetime }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

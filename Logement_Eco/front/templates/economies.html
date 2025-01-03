@@ -1,0 +1,124 @@
+{% extends "index.html" %}
+
+{% block styles %}
+<style>
+    .card-body canvas {
+        background-color: var(--bs-body-bg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    {% if info %}
+        <div class="col-md-8">
+            <div class="accordion" id="facturesAccordion">
+                {% for type in info.type_list %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading_{{ type }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ type }}" aria-expanded="false" aria-controls="collapse_{{ type }}">
+                            {{ type }}
+                        </button>
+                    </h2>
+                    <div id="collapse_{{ type }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ type }}" data-bs-parent="#facturesAccordion">
+                        <div class="accordion-body">
+                            <canvas id="barChart_{{ type }}" style="height: 200px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                
+                    <div class="card-header">
+                        <h5 class="card-title">Nombre de Factures</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text display-6 text-center">{{ info.num_factures }}</p>
+                    </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">Montant Total</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text display-6 text-center">{{ info.total_montant }}€</p>
+                        </div>
+                    </div>
+                
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Type de Facture', 'Consommation'],
+            {% for item in general_chart_data %}
+                ['{{ item.type_nom }}', {{ item.total_consommation }}],
+            {% endfor %}
+        ]);
+
+        var options = {
+            pieHole: 0.4,
+            is3D: true,
+            backgroundColor: '#f8f9fa', /* Cor de fundo clara */
+            colors: ['#2254A3', '#F75D42', '#009473', '#F1B033', '#55C4DD', '#FF6F91'],
+            legend: { position: 'bottom', textStyle: { color: 'black', fontSize: 12 } }
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chartData = {{ bar_chart_data | tojson }};
+        
+        Object.keys(chartData).forEach(type => {
+            const ctx = document.getElementById(`barChart_${type}`).getContext("2d");
+            const data = chartData[type];
+            
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: `Prix (€)`,
+                        data: data.data,
+                        backgroundColor: "rgba(54, 162, 235, 0.5)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: true, text: `Factures : ${type}` }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: "Mois" } },
+                        y: { title: { display: true, text: "Montant (€)" } }
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

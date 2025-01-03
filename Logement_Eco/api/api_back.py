@@ -1,11 +1,12 @@
-from fastapi import FastAPI
-from .routers.bdd import ville, adresse, logement, piece, type_capteur, capteur, mesure, type_facture, facture
-# from routers import autentication
+from fastapi import FastAPI, Depends, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
+from .routers.bdd import ville, adresse, logement, piece, type_capteur, capteur, mesure, type_facture, facture, generic
+from .routers import autentication
 
 # Métadonnées pour la documentation OpenAPI
 tags_metadata = [
-    # {"name": "Auth", "description": "Routes pour l'authentification et l'autorisation"},
-    {"name": "Racine", "description": "Routes de base"},
+    {"name": "Racine", "description": "Routes de base"},    
+    {"name": "Auth", "description": "Routes pour l'authentification et l'autorisation"},
     {"name": "Ville", "description": "Routes pour gérer les villes"},
     {"name": "Adresse", "description": "Routes pour gérer les adresses"},
     {"name": "Logement", "description": "Routes pour gérer les logements"},
@@ -30,14 +31,16 @@ app = FastAPI(
 def health_check():
     return {"status": "OK"}
 
+
 # Inclusion des routeurs avec des préfixes et des tags spécifiques
-app.include_router(ville.router, tags=["Ville"], prefix="/ville")
-app.include_router(adresse.router, tags=["Adresse"], prefix="/adresse")
-app.include_router(logement.router, tags=["Logement"], prefix="/logement")
-app.include_router(piece.router, tags=["Piece"], prefix="/piece")
-app.include_router(type_capteur.router, tags=["Type_Capteur"], prefix="/type_capteur")
-app.include_router(capteur.router, tags=["Capteur"], prefix="/capteur")
-app.include_router(mesure.router, tags=["Mesure"], prefix="/mesure")
-app.include_router(type_facture.router, tags=["Type_Facture"], prefix="/type_facture")
-app.include_router(facture.router, tags=["Facture"], prefix="/facture")
-# app.include_router(autentication.router, tags=["Auth"], prefix="/auth")
+app.include_router(ville.router, tags=["Ville"], prefix="/ville")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(adresse.router, tags=["Adresse"], prefix="/adresse")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(logement.router, tags=["Logement"], prefix="/logement")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(piece.router, tags=["Piece"], prefix="/piece")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(type_capteur.router, tags=["Type_Capteur"], prefix="/type_capteur")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(capteur.router, tags=["Capteur"], prefix="/capteur")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(mesure.router, tags=["Mesure"], prefix="/mesure")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(type_facture.router, tags=["Type_Facture"], prefix="/type_facture")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(facture.router, tags=["Facture"], prefix="/facture")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(generic.router, tags=["Generic"], prefix="/generic")#, dependencies=[Depends(autentication.get_api_key)])
+app.include_router(autentication.router, tags=["Auth"], prefix="/auth")

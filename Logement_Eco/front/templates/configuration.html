@@ -1,0 +1,266 @@
+{% extends "index.html" %}
+
+{% block title %}Configuration - Éco-Logement{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- API Keys Card -->
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Clés API</h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addApiKeyModal">
+                        <i class="bi bi-plus-circle"></i> Nouvelle Clé
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Clé</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key in user_api_keys %}
+                                <tr>
+                                    <td>{{ key.name }}</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control api-key-field" 
+                                                   value="{{ key.key }}" readonly>
+                                            <button class="btn btn-outline-secondary toggle-key-visibility" 
+                                                    type="button">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary copy-key" 
+                                                    type="button" data-key="{{ key.key }}">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-key" 
+                                                data-key-name="{{ key.name }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Actions Card -->
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Actions Utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <button id="logoutButton" class="btn btn-danger">
+                            <i class="bi bi-box-arrow-right"></i> Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add API Key Modal -->
+<div class="modal fade" id="addApiKeyModal" tabindex="-1" aria-labelledby="addApiKeyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addApiKeyModalLabel">Nouvelle Clé API</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addApiKeyForm">
+                    <div class="mb-3">
+                        <label for="keyName" class="form-label">Nom de la clé</label>
+                        <input type="text" class="form-control" id="keyName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="createApiKeyBtn">Créer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New API Key Result Modal -->
+<div class="modal fade" id="apiKeyResultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle Clé API Créée</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Copiez cette clé maintenant. Elle ne sera plus visible après.
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="newApiKey" readonly>
+                    <button class="btn btn-outline-secondary" type="button" id="copyNewKey">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle API key visibility
+    document.querySelectorAll('.toggle-key-visibility').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.api-key-field');
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+    });
+
+    // Copy API key to clipboard
+    document.querySelectorAll('.copy-key').forEach(button => {
+        button.addEventListener('click', async function() {
+            const key = this.dataset.key;
+            try {
+                await navigator.clipboard.writeText(key);
+                
+                // Visual feedback
+                const originalIcon = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-check"></i>';
+                setTimeout(() => {
+                    this.innerHTML = originalIcon;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                alert('Erreur lors de la copie de la clé');
+            }
+        });
+    });
+
+    // Delete API key
+    // document.querySelectorAll('.delete-key').forEach(button => {
+    //     button.addEventListener('click', async function() {
+    //         const keyName = this.dataset.keyName;
+    //         if (confirm(`Êtes-vous sûr de vouloir supprimer la clé "${keyName}" ?`)) {
+    //             try {
+    //                 const response = await fetch(`/bff/delete_key/${keyName}`, {
+    //                     method: 'DELETE'
+    //                 });
+                    
+    //                 if (response.ok) {
+    //                     this.closest('tr').remove();
+    //                 } else {
+    //                     alert('Erreur lors de la suppression de la clé');
+    //                 }
+    //             } catch (err) {
+    //                 console.error('Failed to delete key:', err);
+    //                 alert('Erreur lors de la communication avec le serveur');
+    //             }
+    //         }
+    //     });
+    // });
+
+    // Logout
+    document.getElementById('logoutButton').addEventListener('click', async function() {
+        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            try {
+                window.location.href = '/logout';
+            } catch (err) {
+                console.error('Failed to logout:', err);
+                alert('Erreur lors de la communication avec le serveur');
+            }
+        }
+    });
+    document.getElementById('createApiKeyBtn').addEventListener('click', async function() {
+        const keyName = document.getElementById('keyName').value.trim();
+        
+        if (!keyName) {
+            alert('Veuillez entrer un nom pour la clé');
+            return;
+        }
+
+        try {
+            const token = document.cookie.split('; ').find(row => row.startsWith('access_token=')).split('=')[1];
+            const response = await fetch('/bff/create_key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token, name: keyName, description: '' })
+            });
+            console.log(response);
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Close the creation modal
+                const addModal = bootstrap.Modal.getInstance(document.getElementById('addApiKeyModal'));
+                addModal.hide();
+
+                // Show the result modal with the new key
+                document.getElementById('newApiKey').value = result.key;
+                const resultModal = new bootstrap.Modal(document.getElementById('apiKeyResultModal'));
+                resultModal.show();
+
+                // Refresh the page after closing the result modal
+                document.getElementById('apiKeyResultModal').addEventListener('hidden.bs.modal', function() {
+                    window.location.reload();
+                });
+            } else {
+                alert('Erreur lors de la création de la clé');
+            }
+        } catch (err) {
+            console.error('Failed to create key:', err);
+            alert('Erreur lors de la communication avec le serveur');
+        }
+    });
+
+    // Copy new API key
+    document.getElementById('copyNewKey').addEventListener('click', async function() {
+        const newKey = document.getElementById('newApiKey').value;
+        try {
+            await navigator.clipboard.writeText(newKey);
+            
+            // Visual feedback
+            const originalIcon = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-check"></i>';
+            setTimeout(() => {
+                this.innerHTML = originalIcon;
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            alert('Erreur lors de la copie de la clé');
+        }
+    });
+});
+</script>
+{% endblock %}

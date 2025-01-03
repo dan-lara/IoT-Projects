@@ -2,29 +2,28 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
 from sqlite3 import Connection
 from datetime import datetime
-from ...models.database import Capteur
+from ...models.database import Capteur, requestCapteur
 from ...tools import get_db
 
 router = APIRouter()
 
 # Route pour créer un nouveau capteur
 @router.post("/", response_model=Capteur, tags=["Capteur"])
-def create_capteur(capteur: Capteur, db: Connection = Depends(get_db)):
+def create_capteur(capteur: requestCapteur, db: Connection = Depends(get_db)):
     query = """
-    INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, created_at)
+    INSERT INTO Capteur (id_tc, id_p, ref_commerciale, precision_min, precision_max, actif, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
     """
-    if capteur.created_at is None:
-        capteur.created_at = datetime.now()
+    created_at = datetime.now()
     cursor = db.execute(
         query, 
-        (capteur.id_tc, capteur.id_p, capteur.ref_commerciale, capteur.precision_min, 
-         capteur.precision_max, capteur.created_at)
+        (capteur.id_tc, capteur.id_p, capteur.ref_commerciale,
+         capteur.precision_min, capteur.precision_max, True, created_at)
     )
     db.commit()
     capteur_id = cursor.lastrowid
     cursor.close()
-    return {**capteur, "id": capteur_id}
+    return {**capteur.__dict__, "id": capteur_id}
 
 # Route pour obtenir tous les capteurs, avec des filtres optionnels
 @router.get("/", response_model=List[Capteur], tags=["Capteur"])
@@ -76,16 +75,17 @@ def read_capteur(id: int, db: Connection = Depends(get_db)):
 
 # Route pour mettre à jour un capteur spécifique par ID
 @router.put("/{id}", response_model=Capteur, tags=["Capteur"])
-def update_capteur(id: int, capteur: Capteur, db: Connection = Depends(get_db)):
+def update_capteur(id: int, capteur: requestCapteur, db: Connection = Depends(get_db)):
     query = """
     UPDATE Capteur 
-    SET id_tc = ?, id_p = ?, ref_commerciale = ?, precision_min = ?, precision_max = ?, port_comm = ?, created_at = ?
+    SET id_tc = ?, id_p = ?, ref_commerciale = ?, precision_min = ?, precision_max = ?, actif = ?, created_at = ?
     WHERE id = ?
     """
+    created_at = datetime.now()
     db.execute(
         query, 
-        (capteur.id_tc, capteur.id_p, capteur.ref_commerciale, capteur.precision_min, 
-         capteur.precision_max, capteur.created_at, id)
+        (capteur.id_tc, capteur.id_p, capteur.ref_commerciale,
+         capteur.precision_min, capteur.precision_max, capteur.actif, created_at, id)
     )
     db.commit()
     cursor = db.execute("SELECT * FROM Capteur WHERE id = ?", (id,))

@@ -44,6 +44,10 @@ class Piece(BaseModel):
     created_at: Optional[datetime] = None  # Date de création
 
 # Modèle pour la table Type_Capteur
+class requestType_Capteur(BaseModel):
+    nom: str  # Nom du type de capteur
+    unite_mesure: Optional[str] = None  # Unité de mesure du capteur
+    description: Optional[str] = None  # Description du type de capteur
 class Type_Capteur(BaseModel):
     id: Optional[int] = None  # ID du type de capteur, généré automatiquement
     nom: str  # Nom du type de capteur
@@ -57,6 +61,7 @@ class requestCapteur(BaseModel):
     ref_commerciale: Optional[str] = None  # Référence commerciale du capteur
     precision_min: Optional[float] = None  # Précision minimale du capteur
     precision_max: Optional[float] = None  # Précision maximale du capteur
+    actif: Optional[bool] = None  # Capteur actif ou non
 class Capteur(BaseModel):
     id: Optional[int] = None  # ID du capteur, généré automatiquement
     id_tc: int  # Référence du type de capteur
@@ -104,3 +109,7 @@ class Facture(BaseModel):
     montant: Optional[float] = None  # Montant de la facture
     valeur_consommee: Optional[float] = None  # Valeur consommée
     created_at: Optional[datetime] = None  # Date de création
+
+class requestGeneric(BaseModel):
+    query: str  # Requête SQL
+    params: Optional[list] = None  # Paramètres de la requête

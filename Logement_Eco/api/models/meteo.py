@@ -13,3 +13,8 @@ class WeatherData(BaseModel):
     sea_level: Optional[int] = None  # Niveau de la mer en hPa
     ground_level: Optional[int] = None  # Pression au sol en hPa
     description: str  # Description du temps
+
+class ForecastData(BaseModel):
+    date: str  # Date de la prévision
+    data: WeatherData  # Données météorologiques pour cette date
+    

@@ -1,0 +1,80 @@
+{% extends "index.html" %}
+
+{% block extra_nav %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Mes Logements</h1>
+        </div>
+    </div>
+    <div class="row">
+        {% if user_logements is iterable %}
+            {% for logement in user_logements %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        {% if logement.photo_url %}
+                        <img src="{{ logement.photo_url }}" class="card-img-top img-fluid" alt="Photo du logement" style="max-height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ logement.adresse }}</h5>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Ajouté le {{ logement.created_at }}
+                                </small>
+                            </p>
+                            <dl class="row">
+                                <dt class="col-sm-6">Adresse IP</dt>
+                                <dd class="col-sm-6">{{ logement.adresse_ip }}</dd>
+
+                                <dt class="col-sm-6">Téléphone</dt>
+                                <dd class="col-sm-6">{{ logement.numero_telephone or 'Non disponible' }}</dd>
+                                
+                                <dt class="col-sm-6">Pièces</dt>
+                                <dd class="col-sm-6">{{ logement.pieces|length }}</dd>
+                                
+                            </dl>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="#" class="btn btn-success" data-logement-id="{{ logement.id }}">
+                                Sélectionner
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    Vous n'avez pas encore ajouté de logement.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    function setLogementCookie(logementId) {
+        // Définit le cookie avec le logement_id
+        document.cookie = "logement_id=" + logementId + "; path=/; secure; samesite=strict";
+        // Redirige vers la page avec le logement_id
+        window.location.href = "/";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Sélectionne tous les boutons de sélection de logement
+        const selectButtons = document.querySelectorAll(".btn-success");
+        selectButtons.forEach(function(button) {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Empêche le comportement par défaut du lien
+                const logementId = this.getAttribute("data-logement-id"); // Obtient l'ID du logement
+                setLogementCookie(logementId); // Définit le cookie et redirige
+            });
+        });
+    });
+</script>
+{% endblock %}

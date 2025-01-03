@@ -1,0 +1,182 @@
+{% extends "index.html" %}
+
+{% block title %}Dashboard - Éco-Logement{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sensors Table -->
+        <div class="col-12 col-lg-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Capteurs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Type</th>
+                                    <th>Dernière Mesure</th>
+                                    <th>État</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for capteur in capteurs_table %}
+                                <tr>
+                                    <td>{{ capteur.ref_commerciale }}</td>
+                                    <td>{{ capteur.type }}</td>
+                                    <td>
+                                        {% if capteur.last_mesure_valeur %}
+                                            {{ capteur.last_mesure_valeur }} {{ capteur.unite_mesure }}<br>
+                                            <small class="text-muted">{{ capteur.last_mesure_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        {% else %}
+                                            Aucune mesure
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="text-decoration-none">
+                                            <span class="badge status-badge {% if capteur.actif %}bg-success{% else %}bg-danger{% endif %}" 
+                                                data-capteur-id="{{ capteur.id }}">
+                                                {{ 'Actif' if capteur.actif else 'Inactif' }}
+                                            </span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="col-12 col-lg-7">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Mesures</h5>
+                    <div class="mt-2">
+                        <select class="form-select" id="sensorSelect">
+                            <option value="">Sélectionnez un capteur</option>
+                            {% for capteur in capteurs_table %}
+                                <option value="{{ capteur.id }}" {% if not capteur.last_mesure_valeur %}disabled{% endif %}>
+                                    {{ capteur.ref_commerciale }} - {{ capteur.type }}
+                                    {% if not capteur.last_mesure_valeur %}
+                                        (Aucune mesure)
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="measurementsChart" style="height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chartData = {{ capteur_graph | tojson }};
+        const ctx = document.getElementById("measurementsChart").getContext("2d");
+
+        // Initial empty chart
+        const lineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Mesures",
+                    data: [],
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    title: { display: true, text: "Données du capteur" }
+                },
+                scales: {
+                    x: { title: { display: true, text: "Temps" } },
+                    y: { 
+                        title: { display: true, text: "Valeur" },
+                        beginAtZero: true 
+                    }
+                }
+            }
+        });
+
+        // Update chart data based on selected sensor
+        document.getElementById("sensorSelect").addEventListener("change", function (e) {
+            const selectedId = parseInt(e.target.value);
+            const sensor = chartData.find(sensor => sensor.id === selectedId);
+
+            if (sensor) {
+                lineChart.data.labels = sensor.mesures.map(m => m.x);
+                lineChart.data.datasets[0].data = sensor.mesures.map(m => m.y);
+                lineChart.data.datasets[0].label = `${sensor.type} (${sensor.unite_mesure})`;
+                lineChart.update();
+            } else {
+                // Clear chart if no sensor is selected
+                lineChart.data.labels = [];
+                lineChart.data.datasets[0].data = [];
+                lineChart.data.datasets[0].label = "Mesures";
+                lineChart.update();
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const statusBadges = document.querySelectorAll(".status-badge");
+    
+        statusBadges.forEach(badge => {
+            badge.addEventListener("click", async function () {
+                const capteurId = this.getAttribute("data-capteur-id");
+    
+                if (capteurId) {
+                    try {
+                        // Faz a solicitação para alternar o estado do sensor
+                        const response = await fetch(`/bff/toggle_capteur/${capteurId}`, {
+                            method: 'POST', // Supondo que a rota aceite POST
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+    
+                        if (response.ok) {
+                            // Atualiza o badge no frontend
+                            const newState = await response.json(); // Supondo que o retorno seja o novo estado
+                            if (newState.actif) {
+                                this.classList.remove("bg-danger");
+                                this.classList.add("bg-success");
+                                this.textContent = "Actif";
+                            } else {
+                                this.classList.remove("bg-success");
+                                this.classList.add("bg-danger");
+                                this.textContent = "Inactif";
+                            }
+                        } else {
+                            console.error("Erro ao alternar o estado do sensor:", response.statusText);
+                            alert("Não foi possível alternar o estado do sensor.");
+                        }
+                    } catch (error) {
+                        console.error("Erro na solicitação:", error);
+                        alert("Houve um erro ao comunicar com o servidor.");
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
