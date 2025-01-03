@@ -12,6 +12,6 @@ try:
 except:
     print("Utilisateur déjà créé")
 try:
-    create_user("Daniel", "daniel", [3, 4, 5, 6])
+    create_user("Daniel", "daniel", [1, 2, 4, 6])
 except:
     print("Utilisateur déjà créé")

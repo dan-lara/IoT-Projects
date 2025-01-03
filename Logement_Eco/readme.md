@@ -6,7 +6,7 @@
 5. [Description Ostensible Complète (DOC) 📜](#description-ostensible-complète)
 
 # Présentation du Projet
-![View du Projet](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/front.jpeg)
+![View du Projet](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/front.png)
 
 Ce projet a été développé dans le cadre du TP IoT EISE4, visant à créer une solution complète de monitoring et gestion éco-responsable pour les logements. Mon application permet de :
 
@@ -70,6 +70,10 @@ docker-compose up --build
     └── readme.md
     └── requirements.txt
 ```
+### Diagramme
+![Diagramme](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/diagram.png)
+
+
 ### Modules Principaux du Projet
 
 Le projet est divisé en 4 modules principaux :
@@ -186,7 +190,7 @@ Responsable de la gestion des données et de la structure de la base de données
 - **insere.sql** : Scripts d'insertion des données initiales
 - **schema.png** : Visualisation du schéma de la base de données
 
-### 3. Module Frontend (`/front`)
+## 3. Module Frontend (`/front`)
 Interface utilisateur complète du projet.
 
 ```
@@ -233,7 +237,7 @@ Interface utilisateur complète du projet.
 - economies.html
 - logements.html
 
-### 4. Module Firmware (`/firmware`)
+## 4. Module Firmware (`/firmware`)
 Gestion des capteurs et des mesures physiques.
 
 ```
