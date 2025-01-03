@@ -63,11 +63,11 @@ async def accueil(request: Request):
     username = request.state.username
        
     context = base_context(request, "Accueil", "accueil")
-    print(request.state.user_api_keys)
-    print(request.state.logement_id)
-    print(request.state.user_logements)
-    print(request.state.current_logement)
-    print(request.state.user_logements_list)
+    # print(request.state.user_api_keys)
+    # print(request.state.logement_id)
+    # print(request.state.user_logements)
+    # print(request.state.current_logement)
+    # print(request.state.user_logements_list)
     if logement_id: 
         capteurs_data = get_capteurs_data(logement_id)
         logement_data = get_logement_details(logement_id)

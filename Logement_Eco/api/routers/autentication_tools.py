@@ -159,7 +159,7 @@ def create_api_key(user_id: str, name: str, description: str = None):
             )
             result = cursor.fetchone()
             user_api_keys = result[0] if result else None
-            print(user_api_keys)
+            # print(user_api_keys)
             if user_api_keys:
                 user_api_keys = str(user_api_keys).split(',')
             else:

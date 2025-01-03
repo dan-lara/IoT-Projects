@@ -8,7 +8,6 @@ from ..models.bff_models import Ville, Adresse, Mesure, Capteur, Piece, Logement
 
 router = APIRouter()
 
-
 @router.get("/logement_data/{logement_id}", response_model=Logement)
 def get_logement_details(logement_id: int):
     """
