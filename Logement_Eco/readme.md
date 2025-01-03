@@ -6,7 +6,7 @@
 5. [Description Ostensible Complète (DOC) 📜](#description-ostensible-complète)
 
 # Présentation du Projet
-![Logo du Projet](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/front/static/imgs/logo.jpeg)
+![View du Projet](https://raw.githubusercontent.com/dan-lara/IoT-Projects/master/Logement_Eco/front.jpeg)
 
 Ce projet a été développé dans le cadre du TP IoT EISE4, visant à créer une solution complète de monitoring et gestion éco-responsable pour les logements. Mon application permet de :
 
@@ -14,6 +14,9 @@ Ce projet a été développé dans le cadre du TP IoT EISE4, visant à créer un
 - Visualiser les données des capteurs environnementaux
 - Suivre les économies réalisées
 - Configurer et gérer les différents capteurs/actionneurs
+- Voir les logements qui m'appartiennent
+- Voir les clés api du microcontrôleur à utiliser
+- Connecter l'utilisateur avec contrôle de la session (JWT)
 
 ## Comment Tester le Projet 🚀
 
@@ -281,7 +284,7 @@ pip install -r requirements.txt
 ### Frontend
 - HTML5/CSS3/JavaScript
 - Support des thèmes clair/sombre
-- Interface responsive
+- Interface responsive avec bootstrap
 - Documentation OpenAPI disponible
 
 ### Firmware
