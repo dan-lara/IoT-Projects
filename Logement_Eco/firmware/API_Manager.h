@@ -19,6 +19,7 @@ class APIManager {
     void begin();
     bool getData(const String& api_path = "/");
     void sendData(const StaticJsonDocument<JSON_SIZE>& jsonDoc, const String& api_path, const String& method = "POST");
+    bool checkActif(const int id);
     // APIManager(const char* ssid, const char* password, const String& serverUrl) 
     //   : ssid(ssid), password(password), serverUrl(serverUrl) {}
 

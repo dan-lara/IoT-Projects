@@ -76,3 +76,46 @@ APIManager::APIManager(const char* ssid, const char* password, const String& ser
         Serial.println("WiFi déconnecté!");
       }
     }
+    bool APIManager::checkActif(const int id) {
+      if (WiFi.status() == WL_CONNECTED) {
+        WiFiClient client;
+        HTTPClient http;
+
+        // Initialise la connexion HTTP
+        http.begin(client, serverUrl + "/capteur/" + String(id));
+
+        // Envoyer la requête HTTP GET
+        int httpResponseCode = http.GET();
+
+        if (httpResponseCode == 200) {
+          // Le serveur est en bonne santé
+          String payload = http.getString();
+          http.end();
+
+          StaticJsonDocument<512> doc;
+          DeserializationError error = deserializeJson(doc, payload);
+
+          if (error) {
+              Serial.print("Erro ao analisar JSON: ");
+              Serial.println(error.c_str());
+              return false;
+          }
+
+          if (doc["actif"].as<bool>()) {
+              return true;
+          } else {
+              Serial.println("Capteur inactif!");
+              return false;
+          }
+
+          return true;
+        } else {
+          // Le serveur n'est pas en bonne santé
+          http.end();
+          return false;
+        }
+      } else {
+        Serial.println("WiFi déconnecté!");
+        return false;
+      }
+    }
